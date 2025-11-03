@@ -1,10 +1,7 @@
 import { createApp } from 'vue'
 import App from './login.vue'
-//动态引入mock
-import requestConfig from "@/config/requestConfig"
-if(requestConfig.isMock){
-    import("@/network/mock/mock.js")
-}
+//引入mock
+import "@/network/mock/mock.js"
 //导入api
 import userApi from "@/network/api/userApi.js"
 import tokenApi from '@/network/api/tokenApi.js'
