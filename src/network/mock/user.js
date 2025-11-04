@@ -17,18 +17,18 @@ function parseURLParams(url) {
 
 //模拟用户数据库
 const userDataBase = [
-    {
-        userName:"ISeRi_NiNa",
-        password:"123456",
-        nickName:"NiNa",
-        avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
-    },
-    {
-        userName:"AWa_SuBaRu",
-        password:"654321",
-        nickName:"486",
-        avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
-    },
+    // {
+    //     userName:"ISeRi_NiNa",
+    //     password:"123456",
+    //     nickName:"NiNa",
+    //     avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
+    // },
+    // {
+    //     userName:"AWa_SuBaRu",
+    //     password:"654321",
+    //     nickName:"486",
+    //     avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
+    // },
     {
         userName:"WaGuRi_KaORuKo",
         password:"13579",
