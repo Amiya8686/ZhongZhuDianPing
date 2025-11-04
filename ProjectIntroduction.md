@@ -4,7 +4,7 @@
 
 **使用nodejs版本：v22.19.0**
 
-**创建项目：**使用JS不使用TS，不使用
+**创建项目**:使用JS不使用TS，不使用
 
 ```
 npm create vite@latest
