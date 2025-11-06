@@ -17,7 +17,26 @@ const login = (userInfo)=>{
     return request(option)
 }
 
+//注册
+//输入: object userInfo {userName: string, nickName: string, password: string}
+//输出: promise对象
+//成功: resolve()
+//失败: reject(errorMessage)
+const signUp = (userInfo)=>{
+    const option = {
+        baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
+        url:"/user/signUp",
+        method:"post",
+        data:userInfo,
+    }
+    return request(option)
+}
+
 //获取用户信息
+//输入: 无（通过token识别）
+//输出: promise对象
+//成功: resolve({userName: string, nickName: string, avatarUrl: string})
+//失败: reject(errorMessage)
 const getUserInfo = ()=>{
     const option = {
         baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
@@ -28,4 +47,4 @@ const getUserInfo = ()=>{
 }
 
 
-export default {login,getUserInfo}
+export default {login, signUp, getUserInfo}

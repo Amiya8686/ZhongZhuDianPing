@@ -1,51 +1,592 @@
 <script setup>
-import {reactive,getCurrentInstance,onMounted} from "vue"
+import {reactive, getCurrentInstance, onMounted, ref} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
 const {proxy} = getCurrentInstance()
+
+//用户信息
 const userInfo = reactive({
   userName: defaultUserInfo.userName,
   nickName: defaultUserInfo.nickName,
   avatarUrl:defaultUserInfo.avatarUrl
 })
 
+//是否已登录
+const isLoggedIn = ref(false)
 
-const getUserInfo = async () =>{
+//获取用户信息
+const getUserInfo = async () => {
   try{
+    //检查是否有token
+    const token = localStorage.getItem('token')
+    if(!token){
+      isLoggedIn.value = false
+      return
+    }
     
+    //验证token并获取用户信息
+    await proxy.$tokenApi.checkToken()
     let newUserInfo = await proxy.$userApi.getUserInfo()
     userInfo.userName = newUserInfo.userName
-    userInfo.nickName = newUserInfo.userName
+    userInfo.nickName = newUserInfo.nickName
     userInfo.avatarUrl = newUserInfo.avatarUrl
+    isLoggedIn.value = true
   }catch(error){
-    console.log(error)
+    //token验证失败或获取用户信息失败
+    isLoggedIn.value = false
+    localStorage.removeItem('token')
   }
 }
 
+//跳转到登录页
+const goToLogin = () => {
+  window.location.href = "/user/login"
+}
 
+//跳转到注册页
+const goToSignUp = () => {
+  window.location.href = "/user/signUp"
+}
 
-onMounted(()=>{
+//跳转到美食点评页
+const goToFoodReview = () => {
+  window.location.href = "/foodReview"
+}
+
+//处理美食地图点击（功能待开发）
+const handleFoodMap = () => {
+  ElMessage.info('美食地图功能正在开发中，敬请期待～')
+}
+
+//处理额外功能点击（功能待确定）
+const handleExtraFeature = () => {
+  ElMessage.info('更多精彩功能正在策划中，敬请期待～')
+}
+
+//跳转到个人信息页
+const goToPersonalInfo = () => {
+  window.location.href = "/user/personalInfo"
+}
+
+//跳转到修改密码页
+const goToEditPassword = () => {
+  window.location.href = "/user/editPassword"
+}
+
+//跳转到我的评论页
+const goToMyComment = () => {
+  window.location.href = "/user/myComment"
+}
+
+//退出登录
+const handleLogout = () => {
+  ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    localStorage.removeItem('token')
+    isLoggedIn.value = false
+    userInfo.userName = defaultUserInfo.userName
+    userInfo.nickName = defaultUserInfo.nickName
+    userInfo.avatarUrl = defaultUserInfo.avatarUrl
+    ElMessage.success('已退出登录')
+  }).catch(() => {})
+}
+
+//处理下拉菜单命令
+const handleCommand = (command) => {
+  switch(command){
+    case 'personalInfo':
+      goToPersonalInfo()
+      break
+    case 'editPassword':
+      goToEditPassword()
+      break
+    case 'myComment':
+      goToMyComment()
+      break
+    case 'logout':
+      handleLogout()
+      break
+  }
+}
+
+onMounted(() => {
   getUserInfo();
 })
 
 </script>
 <template>
-  <div class="mainWindow">
-    <el-button type="primary">首页</el-button>
-    <img :src=userInfo.avatarUrl></img>
+  <div class="homePage">
+    <!-- 导航栏 -->
+    <header class="navbar">
+      <div class="navContent">
+        <div class="logo" @click="() => window.location.href = '/home'">
+          <h1>中珠点评</h1>
+          <span class="logoSubtitle">校园美食点评平台</span>
+        </div>
+        
+        <div class="userSection">
+          <!-- 未登录状态 -->
+          <div v-if="!isLoggedIn" class="authButtons">
+            <el-button @click="goToLogin">登录</el-button>
+            <el-button type="primary" @click="goToSignUp">注册</el-button>
+          </div>
+          
+          <!-- 已登录状态 -->
+          <div v-else class="userInfo">
+            <el-dropdown @command="handleCommand">
+              <span class="userDropdown">
+                <el-avatar :src="userInfo.avatarUrl" :size="40"></el-avatar>
+                <span class="userName">{{ userInfo.nickName }}</span>
+                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="personalInfo">个人信息</el-dropdown-item>
+                  <el-dropdown-item command="editPassword">修改密码</el-dropdown-item>
+                  <el-dropdown-item command="myComment">我的评论</el-dropdown-item>
+                  <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="mainContent">
+      <!-- 推荐店铺横幅 -->
+      <section class="recommendSection">
+        <div class="container">
+          <h2 class="sectionTitle">🔥 热门推荐</h2>
+          <el-carousel height="280px" :interval="4000" arrow="always" indicator-position="outside">
+            <!-- 横幅1：3个店铺 -->
+            <el-carousel-item>
+              <div class="stallCarouselItem">
+                <el-card class="stallCard" shadow="hover">
+                  <div class="stallImage">
+                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg" alt="店铺图片">
+                    <div class="stallTag">烧腊</div>
+                  </div>
+                  <div class="stallInfo">
+                    <h3 class="stallName">美味烧腊</h3>
+                    <div class="stallMeta">
+                      <span class="rating">⭐ 4.8</span>
+                      <span class="price">¥25/人</span>
+                    </div>
+                    <p class="stallDesc">招牌烧鸭，酱汁浓郁，肉质鲜嫩</p>
+                  </div>
+                </el-card>
+                
+                <el-card class="stallCard" shadow="hover">
+                  <div class="stallImage">
+                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg" alt="店铺图片">
+                    <div class="stallTag">麻辣烫</div>
+                  </div>
+                  <div class="stallInfo">
+                    <h3 class="stallName">老坛麻辣烫</h3>
+                    <div class="stallMeta">
+                      <span class="rating">⭐ 4.6</span>
+                      <span class="price">¥18/人</span>
+                    </div>
+                    <p class="stallDesc">选料丰富，汤底香浓，辣度可调</p>
+                  </div>
+                </el-card>
+                
+                <el-card class="stallCard" shadow="hover">
+                  <div class="stallImage">
+                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg" alt="店铺图片">
+                    <div class="stallTag">汉堡</div>
+                  </div>
+                  <div class="stallInfo">
+                    <h3 class="stallName">快乐汉堡</h3>
+                    <div class="stallMeta">
+                      <span class="rating">⭐ 4.9</span>
+                      <span class="price">¥22/人</span>
+                    </div>
+                    <p class="stallDesc">新鲜牛肉饼，芝士浓郁，超大份</p>
+                  </div>
+                </el-card>
+              </div>
+            </el-carousel-item>
+            
+            <!-- 横幅2：3个店铺 -->
+            <el-carousel-item>
+              <div class="stallCarouselItem">
+                <el-card class="stallCard" shadow="hover">
+                  <div class="stallImage">
+                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg" alt="店铺图片">
+                    <div class="stallTag">面食</div>
+                  </div>
+                  <div class="stallInfo">
+                    <h3 class="stallName">手工拉面</h3>
+                    <div class="stallMeta">
+                      <span class="rating">⭐ 4.7</span>
+                      <span class="price">¥15/人</span>
+                    </div>
+                    <p class="stallDesc">现拉现煮，劲道十足，汤头鲜美</p>
+                  </div>
+                </el-card>
+                
+                <el-card class="stallCard" shadow="hover">
+                  <div class="stallImage">
+                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg" alt="店铺图片">
+                    <div class="stallTag">盖浇饭</div>
+                  </div>
+                  <div class="stallInfo">
+                    <h3 class="stallName">黄焖鸡米饭</h3>
+                    <div class="stallMeta">
+                      <span class="rating">⭐ 4.5</span>
+                      <span class="price">¥20/人</span>
+                    </div>
+                    <p class="stallDesc">鸡肉嫩滑，酱汁入味，配菜丰富</p>
+                  </div>
+                </el-card>
+                
+                <el-card class="stallCard" shadow="hover">
+                  <div class="stallImage">
+                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg" alt="店铺图片">
+                    <div class="stallTag">饮品</div>
+                  </div>
+                  <div class="stallInfo">
+                    <h3 class="stallName">鲜榨果汁</h3>
+                    <div class="stallMeta">
+                      <span class="rating">⭐ 4.8</span>
+                      <span class="price">¥12/杯</span>
+                    </div>
+                    <p class="stallDesc">新鲜水果现榨，无添加，健康美味</p>
+                  </div>
+                </el-card>
+              </div>
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+      </section>
+      
+      <!-- 功能卡片 -->
+      <section class="featureSection">
+        <div class="container">
+          <h2 class="sectionTitle">平台功能</h2>
+          <div class="featureCards">
+            <el-card class="featureCard" shadow="hover" @click="goToFoodReview">
+              <div class="cardIcon">🍜</div>
+              <h3>美食点评</h3>
+              <p>浏览档口列表，查看详细信息和用户评价</p>
+            </el-card>
+            
+            <el-card class="featureCard" shadow="hover" @click="handleFoodMap">
+              <div class="cardIcon">🗺️</div>
+              <h3>美食地图</h3>
+              <p>地图导航，快速找到心仪的美食位置</p>
+            </el-card>
+            
+            <el-card class="featureCard" shadow="hover" @click="handleExtraFeature">
+              <div class="cardIcon">✨</div>
+              <h3>额外功能</h3>
+              <p>更多精彩功能，敬请期待</p>
+            </el-card>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="footer">
+      <p>&copy; 2025 中珠点评</p>
+    </footer>
   </div>
 </template>
 
-<style scoped lan="less">
-.mainWindow{
-  width:98vw;
-  img{
-    height:100%;
-    width:100%;
-    overflow: hidden;
-    object-fit: cover;
+<style scoped lang="less">
+.homePage{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+/* 导航栏 */
+.navbar{
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  .navContent{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .logo{
+      cursor: pointer;
+      transition: opacity 0.3s;
+      
+      &:hover{
+        opacity: 0.8;
+      }
+      
+      h1{
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .logoSubtitle{
+        display: block;
+        font-size: 12px;
+        color: #999;
+        margin-top: 2px;
+      }
+    }
+    
+    .userSection{
+      .authButtons{
+        display: flex;
+        gap: 10px;
+      }
+      
+      .userInfo{
+        .userDropdown{
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          padding: 5px 10px;
+          border-radius: 20px;
+          outline: none;
+          transition: background-color 0.3s;
+          
+          &:hover{
+            background-color: #f5f5f5;
+            border: 1px solid #333;
+          }
+          
+          .userName{
+            font-size: 14px;
+            color: #333;
+          }
+        }
+      }
+    }
   }
 }
 
+/* 主内容区 */
+.mainContent{
+  flex: 1;
+}
 
+/* 推荐店铺横幅 */
+.recommendSection{
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  .container{
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    .sectionTitle{
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0 0 30px 0;
+      color: white;
+    }
+    
+    .stallCarouselItem{
+      display: flex;
+      gap: 30px;
+      padding: 0 50px;
+      height: 100%;
+      align-items: center;
+      
+      .stallCard{
+        flex: 1;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        
+        &:hover{
+          transform: translateY(-5px);
+          filter: brightness(1.1);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stallImage{
+          position: relative;
+          width: 100%;
+          height: 140px;
+          overflow: hidden;
+          
+          img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
+          
+          .stallTag{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+        
+        &:hover .stallImage img{
+          transform: scale(1.1);
+        }
+        
+        .stallInfo{
+          padding: 15px;
+          
+          .stallName{
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          
+          .stallMeta{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            
+            .rating{
+              color: #ff9800;
+              font-weight: 500;
+            }
+            
+            .price{
+              color: #e74c3c;
+              font-weight: 600;
+            }
+          }
+          
+          .stallDesc{
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+        }
+      }
+    }
+  }
+  
+  // 自定义走马灯箭头
+  :deep(.el-carousel__arrow){
+    background-color: rgba(255, 255, 255, 0.8);
+    
+    &:hover{
+      background-color: white;
+    }
+  }
+  
+  // 自定义走马灯指示器
+  :deep(.el-carousel__indicator){
+    .el-carousel__button{
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    &.is-active .el-carousel__button{
+      background-color: white;
+    }
+  }
+}
+
+/* 功能区域 */
+.featureSection{
+  padding: 60px 20px;
+  
+  .container{
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    .sectionTitle{
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0 0 40px 0;
+      color: #333;
+    }
+    
+    .featureCards{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      
+      .featureCard{
+        cursor: pointer;
+        transition: transform 0.3s;
+        text-align: center;
+        padding: 20px;
+        
+        &:hover{
+          transform: translateY(-10px);
+        }
+        
+        .cardIcon{
+          font-size: 60px;
+          margin-bottom: 20px;
+        }
+        
+        h3{
+          font-size: 24px;
+          font-weight: 600;
+          margin: 0 0 10px 0;
+          color: #333;
+        }
+        
+        p{
+          font-size: 14px;
+          color: #666;
+          line-height: 1.6;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+/* 页脚 */
+.footer{
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  
+  p{
+    margin: 0;
+    font-size: 14px;
+  }
+}
 
 </style>
