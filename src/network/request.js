@@ -23,7 +23,7 @@ httpInstance.interceptors.response.use(res=>{
     }else{
         //普通失败,显示错误信息
         const networkError = "网络错误..."
-        ElMessage.error(msg||networkError);
+        // ElMessage.error(msg||networkError);
         return Promise.reject(msg||networkError);
     }
 })
