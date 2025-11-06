@@ -17,18 +17,18 @@ function parseURLParams(url) {
 
 //模拟用户数据库
 const userDataBase = [
-    // {
-    //     userName:"ISeRi_NiNa",
-    //     password:"123456",
-    //     nickName:"NiNa",
-    //     avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
-    // },
-    // {
-    //     userName:"AWa_SuBaRu",
-    //     password:"654321",
-    //     nickName:"486",
-    //     avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
-    // },
+    {
+        userName:"ISeRi_NiNa",
+        password:"123456",
+        nickName:"NiNa",
+        avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
+    },
+    {
+        userName:"AWa_SuBaRu",
+        password:"654321",
+        nickName:"486",
+        avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
+    },
     {
         userName:"WaGuRi_KaORuKo",
         password:"13579",
@@ -103,6 +103,46 @@ const login = (config)=>{
         }
     }
 }
+
+//注册
+//输入: config对象，body中包含{userName, nickName, password}
+//输出: 响应对象
+//成功: {code: 200, msg: "注册成功"}
+//失败: {code: 999, msg: "用户名已存在"}
+const signUp = (config)=>{
+    const {userName, nickName, password} = JSON.parse(config.body)
+    
+    //检查用户名是否已存在
+    const existingUser = userDataBase.filter((item)=>{
+        return item.userName === userName;
+    })
+    
+    if(existingUser.length > 0){
+        console.log("[signUp] 用户名已存在:", userName)
+        return{
+            code:999,
+            msg:"用户名已存在"
+        }
+    }
+    
+    //创建新用户并添加到数据库
+    const newUser = {
+        userName: userName,
+        password: password,
+        nickName: nickName,
+        avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg",
+    }
+    userDataBase.push(newUser)
+    
+    console.log("[signUp] 注册成功，新用户:", newUser)
+    console.log("[signUp] 当前用户总数:", userDataBase.length)
+
+    return{
+        code:200,
+        msg:"注册成功"
+    }
+}
+
 //请求用户信息
 const getUserInfo = (config)=>{
     const userName = checkToken(config)
@@ -132,4 +172,4 @@ const getUserInfo = (config)=>{
 
 
 
-export default{checkToken,checkTokenApi,login,getUserInfo}
+export default{checkToken, checkTokenApi, login, signUp, getUserInfo}
