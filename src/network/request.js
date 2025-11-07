@@ -11,9 +11,15 @@ httpInstance.interceptors.response.use(res=>{
     const {code,msg,data} = res.data;
     if(code==200){
         //请求成功
+        if(data){
+            if(data.token){
+                const token = data.token;
+                localStorage.setItem("token",JSON.stringify(token));
+            }
+        }
         return data;
     }else if(code==998){
-        //token验证失败，准备跳转页面
+        //token验证失败，清除本地的token,准备跳转页面
         const path = window.location.pathname
         const newPath = getPageToGo(path)
         if(path!==newPath){
