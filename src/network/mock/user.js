@@ -44,7 +44,6 @@ const userDataBase = [
 //失败：undefined
 //验证token（给需要验证token的函数用）
 const checkToken = (config)=>{
-    console.log(config.url)
     const search = parseURLParams(config.url)
     const token = search.token;
 
@@ -79,6 +78,10 @@ const checkTokenApi = (config)=>{
 
 
 //登陆验证
+//输入: config对象, body中包含{userName,password}
+//输出: 响应对象
+//成功: {code:200}
+//失败：{code, msg:"登陆验证失败"}
 const login = (config)=>{
     const {userName,password} = JSON.parse(config.body)
     const validUser = userDataBase.filter((item)=>{
@@ -144,6 +147,11 @@ const signUp = (config)=>{
 }
 
 //请求用户信息
+//输入: config对象,(测试阶段,token在查询参数中)
+//输出: 响应对象
+//成功: {code:200,data:{userName,nickName,avatarUrl}}
+//失败: {code:999,msg:对应错误信息}
+//token验证失败： {code:998,msg:"token验证失败"}
 const getUserInfo = (config)=>{
     const userName = checkToken(config)
     //token验证成功
@@ -169,7 +177,27 @@ const getUserInfo = (config)=>{
     }
 }
 
+//修改用户信息
+//输入: config对象,(body部分为用formData格式编码的用户信息,nickName和avatar文件)
+//输出: 响应对象
+//成功：{code:200}
+//失败: {code:999 msg:对应错误信息}
+//token验证失败： {code:998,msg:"token验证失败"}
+const editUserInfo = (config)=>{
+    const userName = checkToken(config)
+    if(!userName){
+        return {
+            code:998,
+            msg:"token 验证失败"
+        }
+    }
+    //JS中没有解析formData格式的接口，就在控制台输出一下检测一下就行了
+    console.log("mockjs 修改用户信息成功")
+
+    return{
+        code:200
+    }
+}
 
 
-
-export default{checkToken, checkTokenApi, login, signUp, getUserInfo}
+export default{checkToken, checkTokenApi, login, signUp, getUserInfo,editUserInfo}

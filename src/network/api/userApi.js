@@ -46,5 +46,22 @@ const getUserInfo = ()=>{
     return request(option)    
 }
 
+//修改用户信息
+//输入：userInfo的formData对象，里面有新的nickName和avatar文件
+//输出：promise对象
+//成功: resolve()
+//失败: reject(errorMessage)
+const editUserInfo = (userInfo)=>{
+    const option = {
+        baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
+        url:"/user/editInfo",
+        method:"post",
+        data:userInfo,
+        contentType:"multipart/form-data"      //以formData格式传数据
+    }
+    return request(option) 
+}
 
-export default {login, signUp, getUserInfo}
+
+
+export default {login, signUp, getUserInfo, editUserInfo}

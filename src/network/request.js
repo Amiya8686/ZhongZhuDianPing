@@ -37,14 +37,22 @@ httpInstance.interceptors.response.use(res=>{
 
 //封装axios，灵活配置
 const request = (config)=>{
+    if(!config.contentType){
+        config.contentType = "application/json"
+    }
 
-    //配置基地址和资源路径
+
+    //配置基地址和资源路径和资源类型
     const option = {
         baseURL:config.baseURL,
         url:config.url,
         method: config.method.toLowerCase(),
         timeout:10000,
+        headers:{
+            'Content-Type' : config.contentType,
+        }
     }
+
     //获取token
     let token = localStorage.getItem('token');
     if(token){
@@ -52,12 +60,9 @@ const request = (config)=>{
     }
     //附加token到头部
     if(token){
-        option.headers={
-            'Authorization': 'Bearer ' + token
-        }
+        option.headers['Authorization']= "Bearer " + token
     }
 
-    
     //---------------------------------------------------
     //mockJS捕获不了token，开发阶段我们将token放在查询参数中
     if(requestConfig.isMock){
@@ -90,6 +95,7 @@ const request = (config)=>{
             option.data = config.data;
         }
     }
+
     //发送请求
     return httpInstance(option);
 }
@@ -103,6 +109,7 @@ const request = (config)=>{
 //  baseURL,(请求的基地址，比如"https://ljy.api/")
 //  url,    (请求api地址,比如/user/login)
 //  method, (请求方法:get，post)
+//  contentType (data的编码方式: 默认为application/json,multipart/form-data)
 //  data,   (请求内容:get请求为查询参数,post请求为上传的数据)
 //}
 //输出: promise对象

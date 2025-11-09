@@ -1,4 +1,5 @@
 <script setup>
+import { ElMessage } from "element-plus";
 import {reactive, getCurrentInstance, ref} from "vue"
 const {proxy} = getCurrentInstance();
 
@@ -43,6 +44,7 @@ const handleLogin = ()=>{
                 window.location.href = "/home"
             }catch(error){
                 console.error("登录失败:", error)
+                ElMessage.error("登陆失败:",error)
                 //错误信息已在request.js的响应拦截器中通过ElMessage显示
             }finally{
                 isLoading.value = false
@@ -70,12 +72,17 @@ const handleKeyPress = (event)=>{
     }
 }
 
+//函数: 按logo跳转到home页面
+const handleClickLogo = ()=>{
+    window.location.href = "/home"
+}
 </script>
+
 
 <template>
   <div class="loginPage">
     <!-- 左上角 Logo -->
-    <div class="pageLogo" @click="() => window.location.href = '/home'">
+    <div class="pageLogo" @click="handleClickLogo">
       <h1>中珠点评</h1>
       <span class="logoSubtitle">校园美食点评平台</span>
     </div>
@@ -143,7 +150,7 @@ const handleKeyPress = (event)=>{
 .loginPage{
     width: 100vw;
     height: 100vh;
-    background: url('/src/assets/imgs/BingWallpaper.jpg') center/cover no-repeat;
+    background: url('/src/assets/imgs/background/BingWallpaper.jpg') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
