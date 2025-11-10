@@ -14,12 +14,10 @@ const loginInfo = reactive({
 //表单验证规则
 const loginRules = reactive({
     userName: [
-        { required: true, message: "请输入用户名", trigger: "blur" },
-        { min: 3, max: 20, message: "用户名长度应为3-20个字符", trigger: "blur" }
+        { required: true, message: "请输入用户名", trigger: "blur" }
     ],
     password: [
-        { required: true, message: "请输入密码", trigger: "blur" },
-        { min: 6, max: 20, message: "密码长度应为6-20个字符", trigger: "blur" }
+        { required: true, message: "请输入密码", trigger: "blur" }
     ]
 })
 
@@ -43,7 +41,8 @@ const handleLogin = ()=>{
                 window.location.href = "/home"
             }catch(error){
                 console.error("登录失败:", error)
-                //错误信息已在request.js的响应拦截器中通过ElMessage显示
+                //显示错误提示
+                ElMessage.error(error || "登录失败，请检查用户名和密码")
             }finally{
                 isLoading.value = false
             }

@@ -21,9 +21,8 @@ httpInstance.interceptors.response.use(res=>{
         }
         return Promise.reject("token验证失败")
     }else{
-        //普通失败,显示错误信息
+        //普通失败，不显示错误信息，由调用者决定是否提示
         const networkError = "网络错误..."
-        ElMessage.error(msg||networkError);
         return Promise.reject(msg||networkError);
     }
 })
