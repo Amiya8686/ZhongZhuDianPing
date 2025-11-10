@@ -14,10 +14,12 @@ const loginInfo = reactive({
 //表单验证规则
 const loginRules = reactive({
     userName: [
-        { required: true, message: "请输入用户名", trigger: "blur" }
+        { required: true, message: "请输入用户名", trigger: "blur" },
+        { min: 3, max: 20, message: "用户名长度应为3-20个字符", trigger: "blur" }
     ],
     password: [
-        { required: true, message: "请输入密码", trigger: "blur" }
+        { required: true, message: "请输入密码", trigger: "blur" },
+        { min: 6, max: 20, message: "密码长度应为6-20个字符", trigger: "blur" }
     ]
 })
 
@@ -62,6 +64,7 @@ const handleCancel = ()=>{
     window.location.href = "/home"
 }
 
+
 //函数：按Enter键登录
 const handleKeyPress = (event)=>{
     if(event.key === 'Enter'){
@@ -69,12 +72,17 @@ const handleKeyPress = (event)=>{
     }
 }
 
+//函数: 按logo跳转到home页面
+const handleClickLogo = ()=>{
+    window.location.href = "/home"
+}
 </script>
+
 
 <template>
   <div class="loginPage">
     <!-- 左上角 Logo -->
-    <div class="pageLogo" @click="() => window.location.href = '/home'">
+    <div class="pageLogo" @click="handleClickLogo">
       <h1>中珠点评</h1>
       <span class="logoSubtitle">校园美食点评平台</span>
     </div>
@@ -142,7 +150,7 @@ const handleKeyPress = (event)=>{
 .loginPage{
     width: 100vw;
     height: 100vh;
-    background: url('/src/assets/imgs/BingWallpaper.jpg') center/cover no-repeat;
+    background: url('/src/assets/imgs/background/BingWallpaper.jpg') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;

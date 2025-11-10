@@ -1,6 +1,7 @@
 <script setup>
 import {reactive, getCurrentInstance, onMounted, ref} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
+import { ArrowDown } from '@element-plus/icons-vue' // <-- 添加这一行
 const {proxy} = getCurrentInstance()
 
 //用户信息
@@ -63,18 +64,24 @@ const handleExtraFeature = () => {
 }
 
 //跳转到个人信息页
-const goToPersonalInfo = () => {
-  window.location.href = "/user/personalInfo"
+const goToPersonalInfo = () =>{
+  window.open("/user/personalInfo")
+}
+  
+
+//跳转到注册页
+const goToSignUp = () => {
+  window.location.href = "/user/signUp"
 }
 
 //跳转到修改密码页
 const goToEditPassword = () => {
-  window.location.href = "/user/editPassword"
+  window.open("/user/editPassword")
 }
 
 //跳转到我的评论页
 const goToMyComment = () => {
-  window.location.href = "/user/myComment"
+  window.open("/user/myComment")
 }
 
 //退出登录

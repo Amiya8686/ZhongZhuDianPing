@@ -96,12 +96,17 @@ const handleKeyPress = (event)=>{
     }
 }
 
+//函数: 按logo跳转到home页面
+const handleClickLogo = ()=>{
+    window.location.href = "/home"
+}
+
 </script>
 
 <template>
   <div class="signUpPage">
     <!-- 左上角 Logo -->
-    <div class="pageLogo" @click="() => window.location.href = '/home'">
+    <div class="pageLogo" @click="handleClickLogo">
       <h1>中珠点评</h1>
       <span class="logoSubtitle">校园美食点评平台</span>
     </div>
@@ -189,7 +194,7 @@ const handleKeyPress = (event)=>{
 .signUpPage{
     width: 100vw;
     height: 100vh;
-    background: url('/src/assets/imgs/BingWallpaper.jpg') center/cover no-repeat;
+    background: url('/src/assets/imgs/background/BingWallpaper.jpg') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
