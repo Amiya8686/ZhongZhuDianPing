@@ -67,12 +67,6 @@ const handleExtraFeature = () => {
 const goToPersonalInfo = () =>{
   window.open("/user/personalInfo")
 }
-  
-
-//跳转到注册页
-const goToSignUp = () => {
-  window.location.href = "/user/signUp"
-}
 
 //跳转到修改密码页
 const goToEditPassword = () => {
