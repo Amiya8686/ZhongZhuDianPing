@@ -62,6 +62,22 @@ const editUserInfo = (userInfo)=>{
     return request(option) 
 }
 
+//修改用户密码
+//输入：formData对象，里面有newPassword
+//输出：promise对象
+//成功: resolve()
+//失败: reject(errorMessage)
+const editPassword = (formData)=>{
+    const option = {
+        baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
+        url:"/user/editPassword",
+        method:"post",
+        data:formData,
+        contentType:"multipart/form-data"      //以formData格式传数据
+    }
+    return request(option) 
+}
 
 
-export default {login, signUp, getUserInfo, editUserInfo}
+
+export default {login, signUp, getUserInfo, editUserInfo, editPassword}
