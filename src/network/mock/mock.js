@@ -9,6 +9,7 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/user\/getInfo/,"get",options=>{return user.getUserInfo(options)});
     Mock.mock(/\/api\/checkToken/,"get",options=>{return user.checkTokenApi(options)});
     Mock.mock(/\/api\/user\/editInfo/,"post",options=>{return user.editUserInfo(options)});
+    Mock.mock(/\/api\/user\/editPassword/,"post",options=>{return user.editPassword(options)});
 }
 
 
