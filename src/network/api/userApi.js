@@ -64,4 +64,6 @@ const editUserInfo = (userInfo)=>{
 
 
 
+
 export default {login, signUp, getUserInfo, editUserInfo}
+
