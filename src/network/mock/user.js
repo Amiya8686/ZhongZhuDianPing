@@ -200,4 +200,5 @@ const editUserInfo = (config)=>{
 }
 
 
+
 export default{checkToken, checkTokenApi, login, signUp, getUserInfo,editUserInfo}

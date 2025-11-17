@@ -1,5 +1,4 @@
 <script setup>
-import { ElMessage } from "element-plus";
 import {reactive, getCurrentInstance, ref} from "vue"
 const {proxy} = getCurrentInstance();
 
@@ -44,8 +43,8 @@ const handleLogin = ()=>{
                 window.location.href = "/home"
             }catch(error){
                 console.error("登录失败:", error)
-                ElMessage.error("登陆失败:",error)
-                //错误信息已在request.js的响应拦截器中通过ElMessage显示
+                //显示错误提示
+                ElMessage.error(error || "登录失败，请检查用户名和密码")
             }finally{
                 isLoading.value = false
             }
@@ -64,6 +63,7 @@ const goToSignUp = ()=>{
 const handleCancel = ()=>{
     window.location.href = "/home"
 }
+
 
 //函数：按Enter键登录
 const handleKeyPress = (event)=>{
