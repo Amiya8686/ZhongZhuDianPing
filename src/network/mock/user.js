@@ -206,6 +206,7 @@ const editUserInfo = (config)=>{
 //失败: {code:999 msg:对应错误信息}
 //token验证失败： {code:998,msg:"token验证失败"}
 const editPassword = (config)=>{
+    //验证token
     const userName = checkToken(config)
     if(!userName){
         return {
@@ -214,20 +215,22 @@ const editPassword = (config)=>{
         }
     }
     
-    //找到用户并更新密码（实际中formData需要后端解析，这里只模拟成功）
-    const user = userDataBase.find(item => item.userName === userName)
-    if(user){
-        //JS中没有解析formData格式的接口，模拟环境下直接标记成功
-        console.log("mockjs 修改密码成功，用户:", userName)
+    //获取信息
+    const {password,newPassword} = JSON.parse(config.body)
+
+    //找到用户并更新密码
+    const index = userDataBase.findIndex(item =>{return item.userName===userName})
+    if(userDataBase[index].password!=password){
+        return{
+            code:999,
+            msg:"旧密码错误"
+        }
+    }else{
+        userDataBase[index].password=newPassword
         return{
             code:200,
-            msg:"密码修改成功"
+            msg:"修改密码成功"
         }
-    }
-    
-    return{
-        code:999,
-        msg:"用户不存在"
     }
 }
 

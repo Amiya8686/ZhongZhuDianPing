@@ -73,7 +73,6 @@ const editPassword = (formData)=>{
         url:"/user/editPassword",
         method:"post",
         data:formData,
-        contentType:"multipart/form-data"      //以formData格式传数据
     }
     return request(option) 
 }

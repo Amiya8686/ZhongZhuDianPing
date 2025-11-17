@@ -25,12 +25,13 @@ const editRule = reactive({
     { min: 6, max: 20, message: "密码长度应为6-20个字符", trigger: "blur" }
   ],
   confirmPassword: [
-    { required: true, message: "请确认新密码", trigger: "blur" },
     { 
       validator: (rule, value, callback) => {
-        if (value !== formData.newPassword) {
+        if(formData.newPassword!=""&&value==""){
+          callback(new Error('请再次输入新密码'))
+        }else if (value !== formData.newPassword) {
           callback(new Error('两次输入的密码不一致'))
-        } else {
+        }else {
           callback()
         }
       }, 
@@ -69,48 +70,27 @@ const handleCancel = ()=>{
 
 //函数: 提交表单
 const submitForm = async ()=>{
-  //先验证旧密码和新密码
-  if(!formData.oldPassword){
-    ElMessage.error("请输入旧密码")
-    return
-  }
-  if(!formData.newPassword){
-    ElMessage.error("请输入新密码")
-    return
-  }
-  if(!formData.confirmPassword){
-    ElMessage.error("请确认新密码")
-    return
-  }
-  if(formData.newPassword !== formData.confirmPassword){
-    ElMessage.error("两次输入的密码不一致")
-    return
-  }
-  if(formData.newPassword.length < 6 || formData.newPassword.length > 20){
-    ElMessage.error("密码长度应为6-20个字符")
-    return
-  }
-
-  isLoading.value = true
-  
-  //生成formData
-  const submitData = new FormData()
-  submitData.append('newPassword', formData.newPassword)
-
-  //发送请求
-  try{
-    await proxy.$userApi.editPassword(submitData)
-    ElMessage.success("密码修改成功，请重新登录")
-    //延迟跳转到登录页
-    setTimeout(() => {
-      window.location.href = "/user/login"
-    }, 1500)
-  }catch(error){
-    console.log(error)
-    ElMessage.error(error || "密码修改失败")
-  }finally{
-    isLoading.value = false
-  }
+  proxy.$refs["editForm"].validate(async (valid)=>{
+        if(valid){
+            isLoading.value = true
+            try{
+                // 准备注册数据（不包含 confirmPassword）
+                const editInfo = {
+                    password:formData.oldPassword,
+                    newPassword:formData.newPassword
+                }
+                
+                await proxy.$userApi.editPassword(editInfo);
+                ElMessage.success("密码修改成功")    
+            }catch(error){
+              ElMessage.error("修改密码失败:"+error)
+            }finally{
+                isLoading.value = false
+            }
+        }else{
+            ElMessage.warning("请正确填写信息")
+        }
+    })
 }
 
 onMounted(()=>{
@@ -163,7 +143,6 @@ onMounted(()=>{
                     :disabled="isLoading"
                 ></el-input>
             </el-form-item>      
-
             <!-- 确认密码 -->
             <el-form-item prop="confirmPassword">
                 <el-input 
@@ -174,21 +153,30 @@ onMounted(()=>{
                     :disabled="isLoading"
                 ></el-input>
             </el-form-item>
-
             <!-- 按钮组 -->
+            <div class="showPasswordBox">
+              <el-button 
+                @click="togglePasswordVisibility"
+                :disabled="isLoading"
+                class = "showPasswordButton"
+              >
+                {{ showPassword ? '隐藏密码' : '显示密码' }}
+              </el-button>
+            </div>
             <div class="buttonGroup">
-                <el-button 
-                    @click="togglePasswordVisibility"
+                <el-button
+                    type="danger" 
+                    @click="handleCancel"
                     :disabled="isLoading"
                 >
-                    {{ showPassword ? '隐藏密码' : '显示密码' }}
+                  取消
                 </el-button>
                 <el-button 
                     type="primary" 
                     :loading="isLoading"
                     @click="submitForm"
                 >
-                    确认修改密码
+                  确认
                 </el-button>
             </div>
         </el-form>
@@ -249,6 +237,12 @@ onMounted(()=>{
         .el-form-item{
             margin-bottom: 20px;
             justify-content: flex-start;
+        }
+
+        .showPasswordBox{
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 10px;
         }
 
         .buttonGroup{
