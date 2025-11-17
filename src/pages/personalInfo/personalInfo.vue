@@ -1,10 +1,6 @@
 <script setup>
 import {reactive, getCurrentInstance, onMounted, ref} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
-<<<<<<< HEAD
-import { ElMessage } from "element-plus"
-=======
->>>>>>> origin/develop1.1_user
 const {proxy} = getCurrentInstance()
 
 //用户信息
@@ -79,7 +75,6 @@ const handleCancel = ()=>{
 }
 //函数: 提交表单
 const submitForm = async ()=>{
-<<<<<<< HEAD
     proxy.$refs["editBox"].validate(async (valid)=>{
       if(valid){
         isLoading.value=true
@@ -105,27 +100,6 @@ const submitForm = async ()=>{
         ElMessage.error("请输入正确的信息")
       }
   })
-=======
-  isLoading.value=true
-  //生成formData
-  const formData = new FormData()
-  if(avatarFile.value!=null){
-    formData.append('avatar',avatarFile.value)
-  }
-  formData.append('nickName',userInfo.nickName)
-
-  //发送请求
-  try{
-    await proxy.$userApi.editUserInfo(formData)
-    ElMessage.success("修改成功")
-    loadUserInfo()
-  }catch(error){
-    console.log(error)
-    ElMessage.error(error || "修改失败")
-  }finally{
-    isLoading.value = false
-  }
->>>>>>> origin/develop1.1_user
 }
 
 
