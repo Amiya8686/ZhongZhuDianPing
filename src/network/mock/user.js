@@ -199,6 +199,40 @@ const editUserInfo = (config)=>{
     }
 }
 
+//修改用户密码
+//输入: config对象,(body部分为用formData格式编码的新密码)
+//输出: 响应对象
+//成功：{code:200}
+//失败: {code:999 msg:对应错误信息}
+//token验证失败： {code:998,msg:"token验证失败"}
+const editPassword = (config)=>{
+    //验证token
+    const userName = checkToken(config)
+    if(!userName){
+        return {
+            code:998,
+            msg:"token 验证失败"
+        }
+    }
+    
+    //获取信息
+    const {password,newPassword} = JSON.parse(config.body)
+
+    //找到用户并更新密码
+    const index = userDataBase.findIndex(item =>{return item.userName===userName})
+    if(userDataBase[index].password!=password){
+        return{
+            code:999,
+            msg:"旧密码错误"
+        }
+    }else{
+        userDataBase[index].password=newPassword
+        return{
+            code:200,
+            msg:"修改密码成功"
+        }
+    }
+}
 
 
-export default{checkToken, checkTokenApi, login, signUp, getUserInfo,editUserInfo}
+export default{checkToken, checkTokenApi, login, signUp, getUserInfo, editUserInfo, editPassword}
