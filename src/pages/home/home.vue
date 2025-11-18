@@ -67,8 +67,6 @@ const handleExtraFeature = () => {
 const goToPersonalInfo = () =>{
   window.open("/user/personalInfo")
 }
-  
-
 
 //跳转到修改密码页
 const goToEditPassword = () => {
