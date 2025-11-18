@@ -3,6 +3,7 @@
 import Mock from "mockjs"
 import user from "./user.js"
 import comment from "./comment.js"
+import food from "./food.js"
 import requestConfig from "@/config/requestConfig.js";
 if(requestConfig.isMock){
     Mock.mock(/\/api\/user\/login/,"post",options=>{return user.login(options)});
@@ -12,6 +13,8 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/user\/editInfo/,"post",options=>{return user.editUserInfo(options)});
     Mock.mock(/\/api\/user\/getCommentList/,"get",options=>{return comment.getMyComments(options)});
     Mock.mock(/\/api\/user\/deleteComment/,"post",options=>{return comment.deleteComment(options)});
+    Mock.mock(/\/api\/food\/getStallList/,"get",options=>{return food.getStallList(options)});
+    Mock.mock(/\/api\/food\/getStallInfo/,"get",options=>{return food.getStallInfo(options)});
 }
 
 
