@@ -1,5 +1,6 @@
 <script setup>
 import {ref,getCurrentInstance,onMounted} from "vue"
+import { ArrowDown } from '@element-plus/icons-vue'
 const {proxy} = getCurrentInstance()
 
 
@@ -9,6 +10,7 @@ const isShowBody = ref(false)
 //用户信息
 const userInfo = ref({
   username:'',
+  nickName:'',
   avatar:''
 })
 
@@ -23,8 +25,8 @@ const locations = ref(['全部','榕园','槿园','若海','荔园'])
 const selectedLocation = ref('全部')
 
 //排序条件
-const collation = ref('default')  //API中使用collation: ascend/descend/default
-const sortBy = ref('rating')      //API中使用rating或meanPrice
+const collation = ref('descend')  //排序规则: ascend/descend
+const sortBy = ref('rating')      //排序字段: price或rating
 
 //档口列表数据
 const stallList = ref([])         //档口列表
@@ -35,37 +37,23 @@ const totalPageNum = ref(0)       //总页数，API返回totalPageNum
 //验证token并加载用户信息
 const tokenVerify = async ()=>{
   try{
-    //检查是否有token
-    const token = localStorage.getItem('token')
-    if(token){
-      //验证token并获取用户信息
-      await proxy.$tokenApi.checkToken()
-      await loadUserInfo()
-    }
-    //无论是否登录都显示页面和档口列表
+    //直接加载用户信息，如果token不合法，axios响应拦截器会自动跳转到登录页
+    await loadUserInfo()
+    //加载成功后显示页面
     isShowBody.value = true
     loadStallList()
   }catch(error){
-    //token验证失败，清除token
+    //getUserInfo失败会由拦截器自动跳转，这里不需要处理
     console.log(error)
-    localStorage.removeItem('token')
-    //仍然显示页面，只是显示登录按钮
-    isShowBody.value = true
-    loadStallList()
   }
 }
 
 //加载用户信息
 const loadUserInfo = async () => {
-  try {
-    const data = await proxy.$userApi.getUserInfo()
-    userInfo.value.username = data.userName
-    userInfo.value.avatar = data.avatarUrl
-  } catch (error) {
-    console.error('获取用户信息失败', error)
-    userInfo.value.username = ''
-    userInfo.value.avatar = ''
-  }
+  const data = await proxy.$userApi.getUserInfo()
+  userInfo.value.username = data.userName
+  userInfo.value.nickName = data.nickName
+  userInfo.value.avatar = data.avatarUrl
 }
 
 //加载档口列表
@@ -86,11 +74,9 @@ const loadStallList = async () => {
       params.canteen = selectedLocation.value
     }
     
-    //添加排序条件(API字段为collation)
-    if(collation.value !== 'default'){
-      params.collation = collation.value
-      params.colIndex = sortBy.value  //rating 或 meanPrice
-    }
+    //添加排序条件（始终传递）
+    params.collation = collation.value
+    params.orderBy = sortBy.value  //price 或 rating
     
     const data = await proxy.$foodApi.getStallList(params)
     stallList.value = data.stalls || []
@@ -129,13 +115,9 @@ const handleCollationChange = () => {
   loadStallList()
 }
 
-//排序方式切换
+//排序方式切换（点击评分或价格按钮）
 const handleSortByChange = (type) => {
   sortBy.value = type
-  //如果之前是default，切换排序字段时改为倒序
-  if(collation.value === 'default'){
-    collation.value = 'descend'
-  }
   loadStallList()
 }
 
@@ -150,6 +132,11 @@ const goToStall = (stallID) => {
   window.location.href = `/foodReview/stall.html?stallID=${stallID}`
 }
 
+//跳转到主页
+const goToHome = () => {
+  window.location.href = '/home.html'
+}
+
 //跳转到登录页
 const goToLogin = () => {
   window.location.href = '/user/login.html'
@@ -158,6 +145,40 @@ const goToLogin = () => {
 //跳转到个人中心
 const goToPersonalInfo = () => {
   window.location.href = '/user/personalInfo.html'
+}
+
+//跳转到修改密码页
+const goToEditPassword = () => {
+  window.location.href = '/user/editPassword.html'
+}
+
+//跳转到我的评论页
+const goToMyComment = () => {
+  window.location.href = '/user/myComment.html'
+}
+
+//退出登录
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  window.location.href = '/user/login.html'
+}
+
+//处理下拉菜单命令
+const handleCommand = (command) => {
+  switch(command){
+    case 'personalInfo':
+      goToPersonalInfo()
+      break
+    case 'editPassword':
+      goToEditPassword()
+      break
+    case 'myComment':
+      goToMyComment()
+      break
+    case 'logout':
+      handleLogout()
+      break
+  }
 }
 
 //页面挂载时执行
@@ -173,23 +194,29 @@ onMounted(()=>{
   <div class="body" v-show="isShowBody">
     <!-- 顶部导航栏 -->
      <div class="top-bar">
-      <div class="title">美食点评</div>
+      <div class="title" @click="goToHome">
+        <span class="main-title">中珠点评</span>
+        <span class="sub-title">美食点评</span>
+      </div>
       <div class="right-section">
-        <el-button
-          type="warning"
-          @click="goToLogin"
-          v-if="!userInfo.username"
-        >
-          登录
-        </el-button>
-        <el-avatar
-          :src="userInfo.avatar"
-          @click="goToPersonalInfo"
-          v-if="userInfo.username"
-          class="avatar"
-        >
-          {{ userInfo.username }}
-        </el-avatar>
+        <!-- 已登录状态 -->
+        <div v-if="userInfo.username" class="user-info">
+          <el-dropdown @command="handleCommand">
+            <span class="user-dropdown">
+              <el-avatar :src="userInfo.avatar" :size="40"></el-avatar>
+              <span class="user-name">{{ userInfo.nickName }}</span>
+              <el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="personalInfo">个人信息</el-dropdown-item>
+                <el-dropdown-item command="editPassword">修改密码</el-dropdown-item>
+                <el-dropdown-item command="myComment">我的评论</el-dropdown-item>
+                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </div>
      </div>
 
@@ -236,21 +263,20 @@ onMounted(()=>{
         @change="handleCollationChange"
         class="sort-select"
       >
-        <el-option label="默认" value="default"></el-option>
-        <el-option label="倒序" value="descend"></el-option>
+        <el-option label="降序" value="descend"></el-option>
         <el-option label="升序" value="ascend"></el-option>
       </el-select>
 
       <el-button
-        :type="sortBy === 'rating' ? 'warning' : 'primary'"
+        :type="sortBy === 'rating' ? 'primary' : 'warning'"
         @click="handleSortByChange('rating')"
       >
         评分
       </el-button>
 
       <el-button
-        :type="sortBy === 'meanPrice' ? 'warning' : 'primary'"
-        @click="handleSortByChange('meanPrice')"
+        :type="sortBy === 'price' ? 'primary' : 'warning'"
+        @click="handleSortByChange('price')"
       >
         价格
       </el-button>
@@ -291,13 +317,10 @@ onMounted(()=>{
 
     <!-- 分页 -->
     <div class="pagination-section">
-      <div class="pagination-info">
-        可以最多显示{{ Math.min(totalPageNum, 50) }}页
-      </div>
       <el-pagination
         background
         layout="prev, pager, next"
-        :total="Math.min(totalPageNum, 50) * numPerPage"
+        :total="totalPageNum * numPerPage"
         :page-size="numPerPage"
         :current-page="pageIndex"
         @current-change="handlePageChange"
@@ -329,17 +352,62 @@ onMounted(()=>{
 }
 
 .title {
-  font-size: 28px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.title:hover {
+  opacity: 0.8;
+}
+
+.main-title {
+  font-size: 24px;
   color: white;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   letter-spacing: 2px;
 }
 
+.sub-title {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 2px;
+}
+
 .right-section {
   display: flex;
   align-items: center;
   gap: 15px;
+}
+
+.user-info {
+  .user-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+    outline: none;
+    border: none;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .user-name {
+      font-size: 14px;
+      color: white;
+      font-weight: 500;
+    }
+    
+    .el-icon {
+      color: white;
+    }
+  }
 }
 
 .avatar {
@@ -526,15 +594,8 @@ onMounted(()=>{
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
   padding: 40px 0 60px;
   margin-top: 20px;
-}
-
-.pagination-info {
-  font-size: 16px;
-  color: #666;
-  font-weight: 500;
 }
 
 /* Element Plus 按钮样式覆盖 */

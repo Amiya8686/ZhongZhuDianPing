@@ -176,7 +176,7 @@
 
 	string nickName,
 
-	avatar(传图片,限制jpg格式，3MB一张图片),
+	avatar(传图片,限制jpg和png格式，3MB一张图片),
 
 - **响应格式（成功）：**
 
@@ -345,11 +345,25 @@
 - **类型:get**
 - **请求格式(写在查询字符串里面,解析成json时字段类型为string)：**
 
-​	type(类型：烧腊、汉堡， 默认为"default")
+**type详细说明(用中文传输)：**
 
-​	canteen(饭堂，默认为 "default")
+烧腊,汉堡,粉面,自选,烩饭,default
 
-​	collation(排序规则:"ascend","descend","default")
+**canteen详细说明**
+
+榕园食堂，荔园食堂，槿园食堂，若海食堂,default
+
+
+
+
+
+​	type(类型：烧腊、汉堡， 默认为"全部")
+
+​	canteen(饭堂，默认为 "全部")
+
+​	orderBy(按照哪个进行排序:price,rating,default)
+
+​	collation(排序规则默认按照评分:"ascend","descend","default")
 
 ​	numPerPage(每页多少个)
 

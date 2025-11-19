@@ -165,7 +165,7 @@ const checkToken = (config)=>{
 }
 
 //获取档口列表
-//输入: config对象，查询参数包含{type, canteen, collation, numPerPage, pageIndex}
+//输入: config对象，查询参数包含{type, canteen, orderBy, collation, numPerPage, pageIndex}
 //输出: 响应对象
 //成功: {code: 200, data: {stalls: Array, totalPageNum: number, pageIndex: number}}
 //失败: {code: 998, msg: "token unvalid"}
@@ -182,8 +182,9 @@ const getStallList = (config)=>{
     
     //获取查询参数
     const search = parseURLParams(config.url)
-    const type = search.type || 'default'
-    const canteen = search.canteen || 'default'
+    const type = search.type || '全部'
+    const canteen = search.canteen || '全部'
+    const orderBy = search.orderBy || 'default'
     const collation = search.collation || 'default'
     const numPerPage = parseInt(search.numPerPage) || 10
     const pageIndex = parseInt(search.pageIndex) || 1
@@ -202,10 +203,22 @@ const getStallList = (config)=>{
     }
     
     //排序
-    if(collation === 'ascend'){
-        filteredStalls.sort((a, b) => a.rating - b.rating)
-    }else if(collation === 'descend'){
-        filteredStalls.sort((a, b) => b.rating - a.rating)
+    if(collation !== 'default' && orderBy !== 'default'){
+        if(orderBy === 'rating'){
+            //按评分排序
+            if(collation === 'ascend'){
+                filteredStalls.sort((a, b) => a.rating - b.rating)
+            }else if(collation === 'descend'){
+                filteredStalls.sort((a, b) => b.rating - a.rating)
+            }
+        }else if(orderBy === 'price'){
+            //按价格排序
+            if(collation === 'ascend'){
+                filteredStalls.sort((a, b) => a.meanPrice - b.meanPrice)
+            }else if(collation === 'descend'){
+                filteredStalls.sort((a, b) => b.meanPrice - a.meanPrice)
+            }
+        }
     }
     
     //计算分页
