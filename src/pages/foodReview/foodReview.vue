@@ -38,10 +38,9 @@ const totalPageNum = ref(0)       //总页数，API返回totalPageNum
 const tokenVerify = async ()=>{
   try{
     //直接加载用户信息，如果token不合法，axios响应拦截器会自动跳转到登录页
-    await loadUserInfo()
+    await  proxy.$tokenApi.checkToken()
     //加载成功后显示页面
     isShowBody.value = true
-    loadStallList()
   }catch(error){
     //getUserInfo失败会由拦截器自动跳转，这里不需要处理
     console.log(error)
@@ -50,10 +49,14 @@ const tokenVerify = async ()=>{
 
 //加载用户信息
 const loadUserInfo = async () => {
-  const data = await proxy.$userApi.getUserInfo()
-  userInfo.value.username = data.userName
-  userInfo.value.nickName = data.nickName
-  userInfo.value.avatar = data.avatarUrl
+  try {
+    const data = await proxy.$userApi.getUserInfo()
+    userInfo.value.username = data.userName
+    userInfo.value.nickName = data.nickName
+    userInfo.value.avatar = data.avatarUrl
+  } catch (error) {
+    console.error('加载用户信息失败', error)
+  }
 }
 
 //加载档口列表
@@ -61,22 +64,12 @@ const loadStallList = async () => {
   try {
     const params = {
       pageIndex: pageIndex.value,
-      numPerPage: numPerPage.value
+      numPerPage: numPerPage.value,
+      type: selectedCategory.value,
+      canteen: selectedLocation.value,
+      collation: collation.value,
+      orderBy: sortBy.value  //price 或 rating
     }
-    
-    //添加分类筛选(API字段为type)
-    if(selectedCategory.value !== '全部'){
-      params.type = selectedCategory.value
-    }
-    
-    //添加地点筛选(API字段为canteen)
-    if(selectedLocation.value !== '全部'){
-      params.canteen = selectedLocation.value
-    }
-    
-    //添加排序条件（始终传递）
-    params.collation = collation.value
-    params.orderBy = sortBy.value  //price 或 rating
     
     const data = await proxy.$foodApi.getStallList(params)
     stallList.value = data.stalls || []
@@ -129,38 +122,33 @@ const handlePageChange = (page) => {
 
 //跳转到档口详情页
 const goToStall = (stallID) => {
-  window.location.href = `/foodReview/stall.html?stallID=${stallID}`
+  window.location.href = `/foodReview/stall?stallID=${stallID}`
 }
 
 //跳转到主页
 const goToHome = () => {
-  window.location.href = '/home.html'
-}
-
-//跳转到登录页
-const goToLogin = () => {
-  window.location.href = '/user/login.html'
+  window.location.href = '/home'
 }
 
 //跳转到个人中心
 const goToPersonalInfo = () => {
-  window.location.href = '/user/personalInfo.html'
+  window.location.href = '/user/personalInfo'
 }
 
 //跳转到修改密码页
 const goToEditPassword = () => {
-  window.location.href = '/user/editPassword.html'
+  window.location.href = '/user/editPassword'
 }
 
 //跳转到我的评论页
 const goToMyComment = () => {
-  window.location.href = '/user/myComment.html'
+  window.location.href = '/user/myComment'
 }
 
 //退出登录
 const handleLogout = () => {
   localStorage.removeItem('token')
-  window.location.href = '/user/login.html'
+  window.location.href = '/user/login'
 }
 
 //处理下拉菜单命令
@@ -184,6 +172,8 @@ const handleCommand = (command) => {
 //页面挂载时执行
 onMounted(()=>{
   tokenVerify()
+  loadUserInfo()
+  loadStallList()
 })
 
 
