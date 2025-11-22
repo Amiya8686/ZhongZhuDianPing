@@ -21,7 +21,7 @@ const categories = ref(['全部','烧腊','汉堡','粉面','自选','烩饭'])
 const selectedCategory = ref('全部')
 
 //地点选项
-const locations = ref(['全部','榕园','槿园','若海','荔园'])
+const locations = ref(['全部','榕园食堂','槿园食堂','若海食堂','荔园食堂'])
 const selectedLocation = ref('全部')
 
 //排序条件
