@@ -263,41 +263,133 @@ const getStallInfo = (config)=>{
         }
     }
     
-    //模拟推荐菜品列表
-    const dishList = [
-        {
-            ID: 1,
-            name: stall.signatureDish,
-            price: stall.meanPrice,
-            rating: stall.rating,
-            pictrueUrl: stall.pictureUrl
-        }
-    ]
-    
-    //模拟热门评论列表
-    const commentList = [
-        {
-            ID: 1,
-            reviewerName: 'NiNa',
-            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            dateTime: '2025-11-15 12:30:45',
-            rating: 5.0,
-            like: 23,
-            content: '非常好吃，强烈推荐！',
-            pictrue1Url: '',
-            picture2Url: '',
-            picture3Url: ''
-        }
-    ]
+    console.log(`[getStallInfo] 获取档口${stallID}的详细信息`)
     
     return {
         code:200,
         data:{
-            ...stall,
-            dishList: dishList,
-            commentList: commentList
+            ...stall
         }
     }
 }
 
-export default {getStallList, getStallInfo}
+//获取档口菜品列表
+//输入: config对象，查询参数包含{stallID}
+//输出: 响应对象
+//成功: {code: 200, data: Array}
+//失败: {code: 998, msg: "token unvalid"}
+const getStallDishList = (config)=>{
+    const userName = checkToken(config)
+    
+    if(!userName){
+        return {
+            code:998,
+            msg:"token unvalid",
+        }
+    }
+    
+    const search = parseURLParams(config.url)
+    const stallID = parseInt(search.stallID)
+    
+    const stall = stallDataBase.find(item => item.ID === stallID)
+    
+    if(!stall){
+        return {
+            code:200,
+            data:[]
+        }
+    }
+
+    // 针对 ID=3 (快乐汉堡) 返回特定的测试数据
+    if (stallID === 3) {
+        console.log('[getStallDishList] 返回档口3的特殊测试数据')
+        return {
+            code: 200,
+            data: [
+                {
+                    id: 301,
+                    name: '双层芝士牛肉堡',
+                    price: 22.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+                    recommendCount: 156
+                },
+                {
+                    id: 302,
+                    name: '香辣鸡腿堡',
+                    price: 18.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+                    recommendCount: 120
+                },
+                {
+                    id: 303,
+                    name: '大薯条',
+                    price: 12.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+                    recommendCount: 89
+                },
+                {
+                    id: 304,
+                    name: '冰可乐',
+                    price: 6.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+                    recommendCount: 200
+                },
+                {
+                    id: 305,
+                    name: '麦乐鸡块(5块)',
+                    price: 14.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+                    recommendCount: 65
+                }
+            ]
+        }
+    }
+    
+    //模拟菜品数据
+    const dishes = [
+        {
+            id: stallID * 100 + 1,
+            name: stall.signatureDish,
+            price: stall.meanPrice,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            recommendCount: 100 + Math.floor(Math.random() * 50)
+        },
+        {
+            id: stallID * 100 + 2,
+            name: '招牌套餐A',
+            price: stall.meanPrice + 5,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            recommendCount: 80 + Math.floor(Math.random() * 20)
+        },
+        {
+            id: stallID * 100 + 3,
+            name: '超值单人餐',
+            price: stall.meanPrice - 2,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            recommendCount: 60 + Math.floor(Math.random() * 30)
+        },
+        {
+            id: stallID * 100 + 4,
+            name: '特色小吃',
+            price: 8,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            recommendCount: 40 + Math.floor(Math.random() * 10)
+        },
+        {
+            id: stallID * 100 + 5,
+            name: '清爽饮料',
+            price: 5,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            recommendCount: 20 + Math.floor(Math.random() * 5)
+        }
+    ]
+    
+    console.log(`[getStallDishList] 档口${stallID}的菜品列表，共${dishes.length}个`)
+    
+    return {
+        code:200,
+        data: dishes
+    }
+}
+
+export default {getStallList, getStallInfo, getStallDishList}

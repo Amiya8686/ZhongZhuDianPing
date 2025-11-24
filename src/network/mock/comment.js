@@ -15,6 +15,7 @@ const commentDataBase = [
   {
     ID: 1,
     userId: 'ISeRi_NiNa',
+    stallID: 1,
     stallName: '美味烧腊',
     canteen: '榕园食堂',
     dateTime: '2025-11-10 12:30:45',
@@ -28,6 +29,7 @@ const commentDataBase = [
   {
     ID: 2,
     userId: 'ISeRi_NiNa',
+    stallID: 2,
     stallName: '老坛麻辣烫',
     canteen: '榕园食堂',
     dateTime: '2025-11-09 18:20:30',
@@ -41,6 +43,7 @@ const commentDataBase = [
   {
     ID: 3,
     userId: 'ISeRi_NiNa',
+    stallID: 3,
     stallName: '快乐汉堡',
     canteen: '榕园食堂',
     dateTime: '2025-11-08 13:15:20',
@@ -51,9 +54,53 @@ const commentDataBase = [
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
   },
+  // 快乐汉堡的额外测试评论
+  {
+    ID: 301,
+    userId: 'BurgerKing',
+    stallID: 3,
+    stallName: '快乐汉堡',
+    canteen: '槿园食堂',
+    dateTime: '2025-11-20 12:00:00',
+    rating: 5.0,
+    like: 88,
+    content: '这家的汉堡真的是我在学校吃过最好吃的！肉汁丰富，面包松软。',
+    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture2Url: '',
+    picture3Url: ''
+  },
+  {
+    ID: 302,
+    userId: 'Foodie_John',
+    stallID: 3,
+    stallName: '快乐汉堡',
+    canteen: '槿园食堂',
+    dateTime: '2025-11-19 18:30:00',
+    rating: 4.5,
+    like: 45,
+    content: '薯条很脆，但是可乐有点没气了，总体好评。',
+    pictrue1Url: '',
+    picture2Url: '',
+    picture3Url: ''
+  },
+  {
+    ID: 303,
+    userId: 'Alice_Wonder',
+    stallID: 3,
+    stallName: '快乐汉堡',
+    canteen: '槿园食堂',
+    dateTime: '2025-11-18 11:45:00',
+    rating: 5.0,
+    like: 32,
+    content: '双层芝士牛肉堡简直是热量炸弹，但是太快乐了！',
+    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    picture2Url: '',
+    picture3Url: ''
+  },
   {
     ID: 4,
     userId: 'ISeRi_NiNa',
+    stallID: 4,
     stallName: '手工拉面',
     canteen: '槿园食堂',
     dateTime: '2025-11-07 19:45:10',
@@ -67,6 +114,7 @@ const commentDataBase = [
   {
     ID: 5,
     userId: 'ISeRi_NiNa',
+    stallID: 5,
     stallName: '黄焖鸡米饭',
     canteen: '槿园食堂',
     dateTime: '2025-11-06 12:00:00',
@@ -80,6 +128,7 @@ const commentDataBase = [
   {
     ID: 6,
     userId: 'AWa_SuBaRu',
+    stallID: 1,
     stallName: '美味烧腊',
     canteen: '荔园食堂',
     dateTime: '2025-11-05 11:30:00',
@@ -93,6 +142,7 @@ const commentDataBase = [
   {
     ID: 7,
     userId: 'ISeRi_NiNa',
+    stallID: 6,
     stallName: '鲜榨果汁',
     canteen: '荔园食堂',
     dateTime: '2025-11-04 14:20:00',
@@ -106,6 +156,7 @@ const commentDataBase = [
   {
     ID: 8,
     userId: 'ISeRi_NiNa',
+    stallID: 2,
     stallName: '老坛麻辣烫',
     canteen: '荔园食堂',
     dateTime: '2025-11-03 17:30:00',
@@ -119,6 +170,7 @@ const commentDataBase = [
   {
     ID: 9,
     userId: 'ISeRi_NiNa',
+    stallID: 4,
     stallName: '手工拉面',
     canteen: '槿园食堂',
     dateTime: '2025-11-02 12:45:00',
@@ -132,6 +184,7 @@ const commentDataBase = [
   {
     ID: 10,
     userId: 'ISeRi_NiNa',
+    stallID: 5,
     stallName: '黄焖鸡米饭',
     canteen: '槿园食堂',
     dateTime: '2025-11-01 13:00:00',
@@ -145,6 +198,7 @@ const commentDataBase = [
   {
     ID: 11,
     userId: 'ISeRi_NiNa',
+    stallID: 3,
     stallName: '快乐汉堡',
     canteen: '槿园食堂',
     dateTime: '2025-10-31 18:00:00',
@@ -158,6 +212,7 @@ const commentDataBase = [
   {
     ID: 12,
     userId: 'ISeRi_NiNa',
+    stallID: 6,
     stallName: '鲜榨果汁',
     canteen: '荔园食堂',
     dateTime: '2025-10-30 15:30:00',
@@ -275,4 +330,137 @@ const deleteComment = (config)=>{
     }
 }
 
-export default {getMyComments, deleteComment}
+//获取档口的评论列表
+//输入: config对象，查询参数包含{stallID, numPerPage, pageIndex}
+//输出: 响应对象
+//成功: {code: 200, data: {comments: Array, totalPageNum: number, pageIndex: number}}
+//失败: {code: 998, msg: "token unvalid"}
+const getStallCommentList = (config)=>{
+    const userName = checkToken(config)
+    
+    if(!userName){
+        return {
+            code:998,
+            msg:"token unvalid",
+        }
+    }
+    
+    //获取查询参数
+    const search = parseURLParams(config.url)
+    const stallID = parseInt(search.stallID)
+    const numPerPage = parseInt(search.numPerPage) || 5
+    const pageIndex = parseInt(search.pageIndex) || 1
+    
+    //筛选当前档口的评论
+    const stallComments = commentDataBase.filter(item => item.stallID === stallID)
+    
+    //计算分页
+    const totalComments = stallComments.length
+    const totalPageNum = Math.ceil(totalComments / numPerPage)
+    const startIndex = (pageIndex - 1) * numPerPage
+    const endIndex = startIndex + numPerPage
+    const comments = stallComments.slice(startIndex, endIndex)
+    
+    console.log(`[getStallCommentList] 档口${stallID}的评论，总数${totalComments}条，第${pageIndex}页，共${totalPageNum}页`)
+    
+    return {
+        code:200,
+        data:{
+            comments: comments,
+            totalPageNum: totalPageNum,
+            pageIndex: pageIndex
+        }
+    }
+}
+
+//创建档口评论
+//输入: config对象，body中包含{stallID, rating, content, pictrue1Url, picture2Url, picture3Url}
+//输出: 响应对象
+//成功: {code: 200, msg: "评论成功"}
+//失败: {code: 998, msg: "token unvalid"}
+const createStallComment = (config)=>{
+    const userName = checkToken(config)
+    
+    if(!userName){
+        return {
+            code:998,
+            msg:"token unvalid",
+        }
+    }
+    
+    //获取请求体
+    const commentData = JSON.parse(config.body)
+    
+    //生成新评论
+    const newComment = {
+        ID: commentDataBase.length + 1,
+        userId: userName,
+        stallID: commentData.stallID,
+        stallName: '档口名称', // 实际应从档口数据库查询
+        canteen: '食堂名称',
+        dateTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        rating: commentData.rating,
+        like: 0,
+        content: commentData.content,
+        pictrue1Url: commentData.pictrue1Url || '',
+        picture2Url: commentData.picture2Url || '',
+        picture3Url: commentData.picture3Url || ''
+    }
+    
+    //添加到数据库
+    commentDataBase.unshift(newComment)
+    
+    console.log(`[createStallComment] 用户${userName}对档口${commentData.stallID}进行了评论`)
+    
+    return {
+        code:200,
+        msg:"评论成功"
+    }
+}
+
+//评价评论（点赞/取消）
+//输入: config对象，body中包含{commentID, newEvaluation}
+//输出: 响应对象
+//成功: {code: 200, data: {like: number}}
+//失败: {code: 998, msg: "token unvalid"}
+const evaluationComment = (config)=>{
+    const userName = checkToken(config)
+    
+    if(!userName){
+        return {
+            code:998,
+            msg:"token unvalid",
+        }
+    }
+    
+    //获取请求体
+    const {commentID, newEvaluation} = JSON.parse(config.body)
+    
+    //查找评论
+    const comment = commentDataBase.find(item => item.ID === commentID)
+    
+    if(!comment){
+        return {
+            code:999,
+            msg:"评论不存在"
+        }
+    }
+    
+    //处理点赞逻辑
+    if(newEvaluation === 'like'){
+        comment.like += 1
+        console.log(`[evaluationComment] 用户${userName}点赞了评论${commentID}，当前点赞数: ${comment.like}`)
+    }else if(newEvaluation === 'unlike'){
+        comment.like = Math.max(0, comment.like - 1)
+        console.log(`[evaluationComment] 用户${userName}取消点赞评论${commentID}，当前点赞数: ${comment.like}`)
+    }
+    
+    return {
+        code:200,
+        data:{
+            like: comment.like
+        }
+    }
+}
+
+export default {getMyComments, deleteComment, getStallCommentList, createStallComment, evaluationComment}

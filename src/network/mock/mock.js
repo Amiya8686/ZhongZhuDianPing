@@ -27,6 +27,10 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/admin\/getInfo/,"get",options=>{return admin.getAdminInfo(options)});
     Mock.mock(/\/api\/background\/admin\/editPassword/,"post",options=>{return admin.adminEditPassword(options)});
     Mock.mock(/\/api\/background\/admin\/editInfo/,"post",options=>{return admin.adminEditInfo(options)});
+    Mock.mock(/\/api\/food\/getStallDishList/,"get",options=>{return food.getStallDishList(options)});
+    Mock.mock(/\/api\/food\/getStallCommentList/,"get",options=>{return comment.getStallCommentList(options)});
+    Mock.mock(/\/api\/food\/createStallComment/,"post",options=>{return comment.createStallComment(options)});
+    Mock.mock(/\/api\/food\/evaluationComment/,"post",options=>{return comment.evaluationComment(options)});
 }
 
 
