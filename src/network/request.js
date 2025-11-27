@@ -1,5 +1,5 @@
 import axios from "axios"
-import { getPageToGo } from "@/config/specialPageConfig";
+import { getClientPageToGo,getServerPageToGo } from "@/config/specialPageConfig";
 import requestConfig from "@/config/requestConfig"
 
 //配置axios实例
@@ -19,13 +19,21 @@ httpInstance.interceptors.response.use(res=>{
         }
         return data;
     }else if(code==998){
-        //token验证失败，清除本地的token,准备跳转页面
+        //客户端token验证失败，清除本地的token,准备跳转页面
+        localStorage.removeItem("token")
         const path = window.location.pathname
-        const newPath = getPageToGo(path)
+        const newPath = getClientPageToGo(path)
         if(path!==newPath){
             window.location.href=newPath;
         }
-        return Promise.reject("token验证失败")
+        return Promise.reject("客户端token验证失败")
+    }else if(code==997){
+        //服务端token验证失败,直接跳到服务端的登陆页面
+        localStorage.removeItem("token")
+        const path = window.location.pathname
+        const newPath = getServerPageToGo(path)
+        window.location.href=newPath
+        return Promise.reject("服务端token验证失败")
     }else{
         //普通失败，不显示错误信息，由调用者决定是否提示
         const networkError = "网络错误..."

@@ -76,7 +76,7 @@ const handleCancel = ()=>{
 }
 //函数: 提交表单
 const submitForm = async ()=>{
-    proxy.$refs["editBox"].validate(async (valid)=>{
+    proxy.$refs["editForm"].validate( async (valid)=>{
       if(valid){
         isLoading.value=true
         //生成formData
@@ -135,7 +135,7 @@ onMounted(()=>{
             >
 
               <!-- 预览图/默认图标 -->
-              <img :src="userInfo.avatarUrl" class="avatar" />
+            <img :src="userInfo.avatarUrl" class="avatar" />
             </el-upload>       
 
             <el-form-item label="用户名" prop="userName" >

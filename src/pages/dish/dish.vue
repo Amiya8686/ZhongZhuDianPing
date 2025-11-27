@@ -1,4 +1,4 @@
-<script setup>
+w'w'w'w<script setup>
 import {ref, getCurrentInstance, onMounted} from "vue"
 import { ArrowDown } from '@element-plus/icons-vue'
 const {proxy} = getCurrentInstance()
