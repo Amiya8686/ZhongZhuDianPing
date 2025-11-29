@@ -21,6 +21,10 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/user\/deleteComment/,"post",options=>{return comment.deleteComment(options)});
     Mock.mock(/\/api\/food\/getStallList/,"get",options=>{return food.getStallList(options)});
     Mock.mock(/\/api\/food\/getStallInfo/,"get",options=>{return food.getStallInfo(options)});
+    Mock.mock(/\/api\/food\/getStallDishList/,"get",options=>{return food.getStallDishList(options)});
+    Mock.mock(/\/api\/food\/evaluateDish/,"post",options=>{return food.evaluateDish(options)});
+    Mock.mock(/\/api\/food\/getStallCommentList/,"get",options=>{return food.getStallCommentList(options)});
+    Mock.mock(/\/api\/food\/evaluationComment/,"post",options=>{return food.evaluationComment(options)});
     //后台管理mock
     Mock.mock(/\/api\/background\/checkToken/,"post",options=>{return admin.checkTokenApi(options)});
     Mock.mock(/\/api\/background\/admin\/login/,"post",options=>{return admin.adminLogin(options)});
@@ -28,11 +32,3 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/admin\/editPassword/,"post",options=>{return admin.adminEditPassword(options)});
     Mock.mock(/\/api\/background\/admin\/editInfo/,"post",options=>{return admin.adminEditInfo(options)});
 }
-
-
-
-
-
-
-
-
