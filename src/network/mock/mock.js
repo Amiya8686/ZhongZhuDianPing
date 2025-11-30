@@ -9,6 +9,7 @@ import requestConfig from "@/config/requestConfig.js";
 
 //后台管理mock引入
 import admin from "@/network/mock/background/admin"
+import userManage from "@/network/mock/background/userManage"
 if(requestConfig.isMock){
     //客户端mock
     Mock.mock(/\/api\/user\/login/,"post",options=>{return user.login(options)});
@@ -31,6 +32,10 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/food\/getStallCommentList/,"get",options=>{return comment.getStallCommentList(options)});
     Mock.mock(/\/api\/food\/createStallComment/,"post",options=>{return comment.createStallComment(options)});
     Mock.mock(/\/api\/food\/evaluationComment/,"post",options=>{return comment.evaluationComment(options)});
+    //用户管理mock
+    Mock.mock(/\/api\/background\/user\/getUserList/,"get",options=>{return userManage.getUserList(options)});
+    Mock.mock(/\/api\/background\/user\/freezeAccount/,"post",options=>{return userManage.freezeAccount(options)});
+    Mock.mock(/\/api\/background\/user\/defrostAccount/,"post",options=>{return userManage.defrostAccount(options)});
 }
 
 

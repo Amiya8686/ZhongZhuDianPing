@@ -69,18 +69,14 @@ const loadData = async () => {
   loading.value = true
 
   try {
-    // 并发请求：档口详情、推荐菜
-    const [infoRes, dishRes] = await Promise.all([
-      proxy.$foodApi.getStallInfo({ stallID: stallID.value }),
-      proxy.$foodApi.getStallDishList({ stallID: stallID.value })
-    ])
+    // 调用getStallInfo获取档口详情（包含推荐菜和热门评论）
+    const res = await proxy.$foodApi.getStallInfo({ stallID: stallID.value })
     
-    stallInfo.value = infoRes || {}
-    // 推荐菜只显示热门
-    dishList.value = (dishRes || []).slice(0, 5)
-
-    // 加载评论
-    await loadComments()
+    stallInfo.value = res || {}
+    // API返回的推荐菜列表（至多5个）
+    dishList.value = res.dishList || []
+    // API返回的热门评论列表（至多2个）
+    commentList.value = res.commentList || []
   } catch (error) {
     console.error("加载档口数据失败:", error)
   } finally {
@@ -258,7 +254,7 @@ const scrollRight = () => {
             </div>
 
             <div class="info-detail">
-              <p><el-icon><Location /></el-icon> <strong>地点：</strong>{{ stallInfo.canteen }}</p>
+              <p><el-icon><Location /></el-icon> <strong>地点：</strong>{{ stallInfo.canteent || stallInfo.canteen }}</p>
               <p><el-icon><Trophy /></el-icon> <strong>招牌菜：</strong>{{ stallInfo.signatureDish }}</p>
               <p class="intro"><strong>简介：</strong>{{ stallInfo.introduction }}</p>
             </div>
@@ -283,10 +279,10 @@ const scrollRight = () => {
 
             <!-- 滚动容器 -->
             <div class="dish-list" ref="scrollContainer">
-              <div class="dish-card" v-for="dish in dishList" :key="dish.id">
+              <div class="dish-card" v-for="dish in dishList" :key="dish.ID">
                 <div class="dish-img">
-                  <img :src="dish.pictureUrl" alt="菜品图片" />
-                  <span class="recommend-tag">推荐 {{ dish.recommendCount || 99 }}</span>
+                  <img :src="dish.pictrueUrl || dish.pictureUrl" alt="菜品图片" />
+                  <span class="recommend-tag">推荐 {{ dish.rating || 4.5 }}分</span>
                 </div>
                 <div class="dish-info">
                   <div class="dish-name">{{ dish.name }}</div>
@@ -310,12 +306,12 @@ const scrollRight = () => {
           <div class="comment-list">
             <div class="comment-item" v-for="comment in commentList" :key="comment.ID">
               <!-- 头像 -->
-              <el-avatar :size="50" :src="comment.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="comment-avatar"></el-avatar>
+              <el-avatar :size="50" :src="comment.avatarUrl || comment.avatar || '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'" class="comment-avatar"></el-avatar>
               
               <!-- 内容主体 -->
               <div class="comment-content">
                 <div class="comment-user">
-                  <span class="username">{{ comment.userId }}</span>
+                  <span class="username">{{ comment.reviewerName || comment.userId }}</span>
                   <el-rate v-model="comment.rating" disabled size="small" />
                 </div>
                 <div class="comment-time">{{ comment.dateTime }}</div>
@@ -327,11 +323,26 @@ const scrollRight = () => {
                     v-if="comment.pictrue1Url"
                     :src="comment.pictrue1Url"
                     :preview-src-list="[comment.pictrue1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
+                    :initial-index="0"
                     fit="cover"
                     class="c-img"
                   />
-                  <el-image v-if="comment.picture2Url" :src="comment.picture2Url" fit="cover" class="c-img"/>
-                  <el-image v-if="comment.picture3Url" :src="comment.picture3Url" fit="cover" class="c-img"/>
+                  <el-image 
+                    v-if="comment.picture2Url" 
+                    :src="comment.picture2Url" 
+                    :preview-src-list="[comment.pictrue1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
+                    :initial-index="1"
+                    fit="cover" 
+                    class="c-img"
+                  />
+                  <el-image 
+                    v-if="comment.picture3Url" 
+                    :src="comment.picture3Url" 
+                    :preview-src-list="[comment.pictrue1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
+                    :initial-index="2"
+                    fit="cover" 
+                    class="c-img"
+                  />
                 </div>
 
                 <!-- 点赞 -->

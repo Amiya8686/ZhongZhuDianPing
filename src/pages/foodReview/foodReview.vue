@@ -122,7 +122,7 @@ const handlePageChange = (page) => {
 
 //跳转到档口详情页
 const goToStall = (stallID) => {
-  window.location.href = `/foodReview/stall?stallID=${stallID}`
+  window.open(`/foodReview/stall.html?stallID=${stallID}`, '_blank');
 }
 
 //跳转到主页

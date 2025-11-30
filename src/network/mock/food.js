@@ -265,10 +265,88 @@ const getStallInfo = (config)=>{
     
     console.log(`[getStallInfo] 获取档口${stallID}的详细信息`)
     
+    // 推荐菜品列表
+    const dishList = [
+        {
+            ID: stallID * 100 + 1,
+            name: stall.signatureDish,
+            price: stall.meanPrice,
+            rating: Number(stall.rating.toFixed(1)),
+            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: stallID * 100 + 2,
+            name: '招牌套餐',
+            price: stall.meanPrice + 5,
+            rating: Number((stall.rating - 0.1).toFixed(1)),
+            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: stallID * 100 + 3,
+            name: '超值单人餐',
+            price: stall.meanPrice - 2,
+            rating: Number((stall.rating - 0.2).toFixed(1)),
+            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: stallID * 100 + 4,
+            name: '特色小吃',
+            price: 8,
+            rating: Number((stall.rating - 0.3).toFixed(1)),
+            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: stallID * 100 + 5,
+            name: '饮料',
+            price: 5,
+            rating: Number((stall.rating - 0.5).toFixed(1)),
+            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        }
+    ]
+    
+    // 按照API文档生成热门评论列表（至多2个）
+    const commentList = [
+        {
+            ID: stallID * 10 + 1,
+            reviewerName: '美食达人',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-28 12:30:00',
+            rating: 5,
+            like: 88,
+            evaluation: 'none',
+            content: `${stall.name}的${stall.signatureDish}真的很好吃，推荐大家来试试！`,
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture3Url: ''
+        },
+        {
+            ID: stallID * 10 + 2,
+            reviewerName: '吃货小王',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-27 18:15:00',
+            rating: 4.5,
+            like: 56,
+            evaluation: 'none',
+            content: '环境不错，味道也很好，性价比高！',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture2Url: '',
+            picture3Url: ''
+        }
+    ]
+    
     return {
         code:200,
         data:{
-            ...stall
+            ID: stall.ID,
+            name: stall.name,
+            rating: stall.rating,
+            meanPrice: stall.meanPrice,
+            introduction: stall.introduction,
+            canteent: stall.canteen,
+            signatureDish: stall.signatureDish,
+            pictureUrl: stall.pictureUrl,
+            dishList: dishList,
+            commentList: commentList
         }
     }
 }
