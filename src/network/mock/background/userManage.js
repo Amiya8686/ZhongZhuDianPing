@@ -13,53 +13,64 @@ function parseURLParams(url) {
     return params;
 }
 
+//默认密码常量
+const DEFAULT_PASSWORD = "123456";
+
 //模拟用户数据库
 const userDataBase = [
     {
         userName: "zhangsan",
         nickName: "张三",
+        password: "zhangsan123",
         status: "启用",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg"
     },
     {
         userName: "lisi",
         nickName: "李四",
+        password: "lisi123",
         status: "冻结",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg"
     },
     {
         userName: "wangwu",
         nickName: "王五",
+        password: "wangwu123",
         status: "启用",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg"
     },
     {
         userName: "zhaoliu",
         nickName: "赵六",
+        password: "zhaoliu123",
         status: "启用",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg"
     },
     {
         userName: "sunqi",
         nickName: "孙七",
+        password: "sunqi123",
         status: "冻结",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg"
     },
     {
         userName: "zhouba",
         nickName: "周八",
+        password: "zhouba123",
         status: "启用",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg"
     },
     {
         userName: "wujiu",
         nickName: "吴九",
+        password: "wujiu123",
         status: "启用",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg"
     },
     {
         userName: "zhengshi",
         nickName: "郑十",
+        password: "zhengshi123",
         status: "冻结",
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg"
     }
@@ -152,4 +163,31 @@ const defrostAccount = (config) => {
     };
 };
 
-export default { getUserList, freezeAccount, defrostAccount };
+// 重置用户密码
+const resetPassword = (config) => {
+    const { userName } = JSON.parse(config.body);
+
+    const userIndex = userDataBase.findIndex(user => user.userName === userName);
+
+    if (userIndex === -1) {
+        return {
+            code: 999,
+            msg: "用户不存在"
+        };
+    }
+
+    // 重置密码为默认密码
+    const oldPassword = userDataBase[userIndex].password;
+    userDataBase[userIndex].password = DEFAULT_PASSWORD;
+    
+    console.log(`[resetPassword] 用户 ${userName} 的密码已从 "${oldPassword}" 重置为默认密码 "${DEFAULT_PASSWORD}"`);
+
+    return {
+        code: 200,
+        data: {
+            newPassword: DEFAULT_PASSWORD
+        }
+    };
+};
+
+export default { getUserList, freezeAccount, defrostAccount, resetPassword };

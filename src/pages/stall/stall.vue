@@ -84,20 +84,6 @@ const loadData = async () => {
   }
 }
 
-// 加载评论列表
-const loadComments = async () => {
-  try {
-    const res = await proxy.$foodApi.getStallCommentList({
-      stallID: stallID.value,
-      pageIndex: 1, // 首页只加载第一页
-      numPerPage: 2 // 首页只显示2条热门评论
-    })
-    commentList.value = res.comments || []
-  } catch (error) {
-    console.error("加载评论数据失败:", error)
-  }
-}
-
 // 提交评论
 const submitComment = async () => {
   if(!commentForm.value.content.trim()) {
@@ -122,7 +108,7 @@ const submitComment = async () => {
       images: []
     }
     pageIndex.value = 1
-    await loadComments() // 刷新评论
+    await loadData() // 刷新档口数据（包含评论）
   } catch (error) {
     console.error('评论失败:', error)
     alert('评论失败，请重试')
@@ -136,12 +122,12 @@ const goBack = () => {
 
 // 查看更多推荐菜
 const viewMoreDishes = () => {
-  globalThis.location.href = `./stall/dish.html?stallID=${stallID.value}`
+  globalThis.open(`./stall/dish.html?stallID=${stallID.value}`, '_blank')
 }
 
 // 查看全部评论
 const viewAllComments = () => {
-  globalThis.location.href = `./stall/comment.html?stallID=${stallID.value}`
+  globalThis.open(`./stall/comment.html?stallID=${stallID.value}`, '_blank')
 }
 
 // 查看全景图

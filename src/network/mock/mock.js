@@ -36,6 +36,7 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/user\/getUserList/,"get",options=>{return userManage.getUserList(options)});
     Mock.mock(/\/api\/background\/user\/freezeAccount/,"post",options=>{return userManage.freezeAccount(options)});
     Mock.mock(/\/api\/background\/user\/defrostAccount/,"post",options=>{return userManage.defrostAccount(options)});
+    Mock.mock(/\/api\/background\/user\/retSetPassword/,"post",options=>{return userManage.resetPassword(options)});
 }
 
 

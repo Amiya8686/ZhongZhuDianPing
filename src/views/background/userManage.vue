@@ -17,7 +17,6 @@ const userList = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalPages = ref(0)
-const jumpPage = ref(1)
 
 // 加载用户列表
 const loadUserList = async () => {
@@ -33,7 +32,6 @@ const loadUserList = async () => {
         const data = await proxy.$userManageApi.getUserList(params)
         userList.value = data.userList
         totalPages.value = data.totalPageNum
-        jumpPage.value = currentPage.value
     } catch (error) {
         ElMessage.error('获取用户列表失败')
         console.error(error)
@@ -61,6 +59,35 @@ const confirmDialogVisible = ref(false)
 const confirmDialogType = ref('freeze')
 const confirmLoading = ref(false)
 const pendingUser = ref(null)
+
+// 用户详情对话框
+const detailDialogVisible = ref(false)
+const detailUser = ref(null)
+
+// 打开用户详情对话框
+const handleViewDetail = (row) => {
+    detailUser.value = { ...row }
+    detailDialogVisible.value = true
+}
+
+// 关闭用户详情对话框
+const closeDetailDialog = () => {
+    detailDialogVisible.value = false
+    detailUser.value = null
+}
+
+// 重置用户密码
+const handleResetPassword = async () => {
+    if (!detailUser.value) return
+    try {
+        const res = await proxy.$userManageApi.resetPassword(detailUser.value.userName)
+        ElMessage.success(`已重置用户「${detailUser.value.nickName}」的密码为：${res.newPassword}`)
+        closeDetailDialog()
+    } catch (error) {
+        ElMessage.error('重置密码失败')
+        console.error(error)
+    }
+}
 
 const confirmDialogTitle = computed(() => confirmDialogType.value === 'freeze' ? '冻结账号' : '解冻账号')
 const confirmDialogMessage = computed(() => {
@@ -112,33 +139,20 @@ const handleConfirmAction = async () => {
             pendingUser.value.status = '启用'
             ElMessage.success('解冻成功')
         }
-        closeConfirmDialog()
+        await loadUserList() // 刷新列表
     } catch (error) {
         ElMessage.error('操作失败')
         console.error(error)
     } finally {
         confirmLoading.value = false
+        confirmDialogVisible.value = false // 自动关闭对话框
+        pendingUser.value = null
     }
 }
 
 // 分页改变
 const handlePageChange = (page) => {
     currentPage.value = page
-    jumpPage.value = page
-    loadUserList()
-}
-
-const handleJumpToPage = () => {
-    if (totalPages.value === 0) return
-    let target = Number(jumpPage.value)
-    if (!target || target < 1) target = 1
-    if (target > totalPages.value) target = totalPages.value
-    if (target === currentPage.value) {
-        jumpPage.value = target
-        return
-    }
-    currentPage.value = target
-    jumpPage.value = target
     loadUserList()
 }
 
@@ -232,7 +246,17 @@ onMounted(() => {
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="160" align="center">
+                <el-table-column label="详情" width="100" align="center">
+                    <template #default="{ row }">
+                        <el-button
+                            type="primary"
+                            link
+                            size="small"
+                            @click="handleViewDetail(row)"
+                        >查看</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="100" align="center">
                     <template #default="{ row }">
                         <el-button
                             v-if="row.status === '启用'"
@@ -268,18 +292,6 @@ onMounted(() => {
                     <template #default>
                         <div class="pagination-extra">
                             <span class="pagination-total">共 {{ totalPages || 0 }} 页</span>
-                            <div class="pagination-jump" v-if="totalPages > 0">
-                                <span>跳转到</span>
-                                <el-input-number
-                                    v-model="jumpPage"
-                                    :min="1"
-                                    :max="totalPages"
-                                    :disabled="totalPages === 0"
-                                    size="small"
-                                />
-                                <span>页</span>
-                                <el-button size="small" type="primary" @click="handleJumpToPage" :disabled="totalPages === 0">确定</el-button>
-                            </div>
                         </div>
                     </template>
                 </el-pagination>
@@ -304,6 +316,56 @@ onMounted(() => {
                 >
                     {{ confirmDialogType === 'freeze' ? '确认' : '确认' }}
                 </el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 用户详情对话框 -->
+        <el-dialog
+            v-model="detailDialogVisible"
+            title="用户详情"
+            width="480px"
+            :close-on-click-modal="false"
+        >
+            <div class="detail-content" v-if="detailUser">
+                <!-- 用户头像 -->
+                <div class="detail-avatar">
+                    <el-avatar :size="120" :src="detailUser.avatarUrl">
+                        <template #error>
+                            <el-icon :size="60"><User /></el-icon>
+                        </template>
+                    </el-avatar>
+                </div>
+
+                <!-- 用户信息区域 -->
+                <div class="detail-info">
+                    <div class="info-item">
+                        <el-input
+                            v-model="detailUser.userName"
+                            :prefix-icon="User"
+                            disabled
+                            size="large"
+                        >
+                            <template #prepend>用户名</template>
+                        </el-input>
+                    </div>
+                    <div class="info-item">
+                        <el-input
+                            v-model="detailUser.nickName"
+                            :prefix-icon="Postcard"
+                            disabled
+                            size="large"
+                        >
+                            <template #prepend>昵称</template>
+                        </el-input>
+                    </div>
+                </div>
+            </div>
+
+            <template #footer>
+                <div class="detail-footer">
+                    <el-button @click="closeDetailDialog" size="large">取消</el-button>
+                    <el-button type="danger" @click="handleResetPassword" size="large">重置密码</el-button>
+                </div>
             </template>
         </el-dialog>
     </div>
@@ -442,6 +504,59 @@ onMounted(() => {
     font-size: 16px;
     color: #303133;
     padding: 10px 0;
+}
+
+/* 用户详情对话框样式 */
+.detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 20px 0;
+}
+
+.detail-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    :deep(.el-avatar) {
+        border: 4px solid #f0f2f5;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+}
+
+.detail-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+    .info-item {
+        width: 100%;
+        
+        :deep(.el-input-group__prepend) {
+            min-width: 80px;
+            background-color: #f5f7fa;
+            font-weight: 600;
+            color: #606266;
+        }
+        
+        :deep(.el-input__wrapper) {
+            background-color: #f9fafb;
+        }
+    }
+}
+
+.detail-footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 12px;
+    
+    .el-button {
+        flex: 1;
+    }
 }
 
 :deep(.el-form-item) {

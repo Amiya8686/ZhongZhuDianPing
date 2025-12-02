@@ -46,4 +46,19 @@ const defrostAccount = (userName) => {
     return request(option)
 }
 
-export default { getUserList, freezeAccount, defrostAccount }
+// 重置用户密码
+// 输入: string userName
+// 输出: promise对象
+// 成功: resolve({newPassword: string})
+// 失败: reject(errorMessage)
+const resetPassword = (userName) => {
+    const option = {
+        baseURL: requestConfig.isMock ? requestConfig.mockURL : requestConfig.baseURL,
+        url: "/background/user/retSetPassword",
+        method: "post",
+        data: { userName },
+    }
+    return request(option)
+}
+
+export default { getUserList, freezeAccount, defrostAccount, resetPassword }
