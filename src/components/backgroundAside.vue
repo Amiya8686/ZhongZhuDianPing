@@ -44,7 +44,7 @@ const goToPath = (path) => {
 .sidebar{
     height: 100vh;
     background: #f7f8fa; /* 白灰基底 */
-    margin-right: 10px;
+    margin-right: 1px;
     margin-top:0;
     box-shadow: 0 8px 22px rgba(20, 30, 44, 0.06);
     border-right: 1px solid rgba(0,0,0,0.04);

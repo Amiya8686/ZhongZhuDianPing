@@ -144,4 +144,4 @@ const adminEditInfo = (config)=>{
 }
 
 
-export default {adminLogin,checkTokenApi,getAdminInfo,adminEditPassword,adminEditInfo}
+export default {parseURLParams,adminLogin,checkTokenApi,getAdminInfo,adminEditPassword,adminEditInfo,checkToken}
