@@ -126,7 +126,7 @@ onMounted(() => {
             
             <div class="stallInfo">
               <div class="stallName">{{ comment.stallName }}</div>
-              <div class="canteenName">{{ comment.canteent }}</div>
+              <div class="canteenName">{{ comment.canteen }}</div>
             </div>
           </div>
           

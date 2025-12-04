@@ -8,8 +8,4 @@
 </template>
 
 <style scope>
-.app{
-    height:100vh;
-    width:100vw;
-}
 </style>
