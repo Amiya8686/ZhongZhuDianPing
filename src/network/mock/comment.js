@@ -22,7 +22,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 23,
     content: '这家店的菜品真的很不错，味道很正宗，服务态度也很好，环境优雅，价格合理，非常推荐大家来尝试！',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture3Url: ''
   },
@@ -36,7 +36,7 @@ const commentDataBase = [
     rating: 4.0,
     like: 15,
     content: '麻辣烫的味道还可以，选择挺多的，就是人有点多需要排队。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -50,7 +50,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 30,
     content: '汉堡超级好吃！肉饼很厚实，配菜新鲜，薯条也很脆，性价比很高！',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
   },
@@ -65,7 +65,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 88,
     content: '这家的汉堡真的是我在学校吃过最好吃的！肉汁丰富，面包松软。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -79,7 +79,7 @@ const commentDataBase = [
     rating: 4.5,
     like: 45,
     content: '薯条很脆，但是可乐有点没气了，总体好评。',
-    pictrue1Url: '',
+    picture1Url: '',
     picture2Url: '',
     picture3Url: ''
   },
@@ -93,7 +93,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 32,
     content: '双层芝士牛肉堡简直是热量炸弹，但是太快乐了！',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -107,7 +107,7 @@ const commentDataBase = [
     rating: 3.0,
     like: 8,
     content: '面条味道一般，汤头有点咸，不过价格便宜。',
-    pictrue1Url: '',
+    picture1Url: '',
     picture2Url: '',
     picture3Url: ''
   },
@@ -121,7 +121,7 @@ const commentDataBase = [
     rating: 4.0,
     like: 18,
     content: '黄焖鸡做得不错，鸡肉很嫩，酱汁入味，配菜丰富，值得一试。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -135,7 +135,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 42,
     content: '非常棒的体验！',
-    pictrue1Url: '',
+    picture1Url: '',
     picture2Url: '',
     picture3Url: ''
   },
@@ -149,7 +149,7 @@ const commentDataBase = [
     rating: 4.0,
     like: 12,
     content: '性价比不错，下次还会来。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -163,7 +163,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 35,
     content: '超级满意！强烈推荐给大家，环境卫生，服务周到，价格实惠。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture3Url: ''
   },
@@ -177,7 +177,7 @@ const commentDataBase = [
     rating: 3.0,
     like: 5,
     content: '一般般吧，没有特别出彩的地方。',
-    pictrue1Url: '',
+    picture1Url: '',
     picture2Url: '',
     picture3Url: ''
   },
@@ -191,7 +191,7 @@ const commentDataBase = [
     rating: 4.0,
     like: 20,
     content: '味道还不错，就是等待时间有点长。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -205,7 +205,7 @@ const commentDataBase = [
     rating: 5.0,
     like: 28,
     content: '太好吃了！每次来都很满意，店家态度很好。',
-    pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '',
     picture3Url: ''
   },
@@ -219,7 +219,7 @@ const commentDataBase = [
     rating: 4.0,
     like: 16,
     content: '口味适中，分量足，值得一试。',
-    pictrue1Url: '',
+    picture1Url: '',
     picture2Url: '',
     picture3Url: ''
   }
@@ -374,7 +374,7 @@ const getStallCommentList = (config)=>{
 }
 
 //创建档口评论
-//输入: config对象，body中包含{stallID, rating, content, pictrue1Url, picture2Url, picture3Url}
+//输入: config对象，body中包含{stallID, rating, content, picture1Url, picture2Url, picture3Url}
 //输出: 响应对象
 //成功: {code: 200, msg: "评论成功"}
 //失败: {code: 998, msg: "token unvalid"}
@@ -389,7 +389,24 @@ const createStallComment = (config)=>{
     }
     
     //获取请求体
-    const commentData = JSON.parse(config.body)
+    let commentData = {}
+    if (config.body instanceof FormData) {
+        commentData.stallID = config.body.get('stallID')
+        commentData.rating = Number(config.body.get('rating'))
+        commentData.content = config.body.get('content')
+        // 模拟图片上传，如果有文件则生成模拟URL
+        const files = config.body.getAll('files')
+        if (files.length > 0) commentData.picture1Url = '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        if (files.length > 1) commentData.picture2Url = '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        if (files.length > 2) commentData.picture3Url = '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+    } else {
+        try {
+            commentData = JSON.parse(config.body)
+        } catch (e) {
+            console.error('解析评论数据失败', e)
+            // 兼容处理，如果不是JSON也不是FormData，可能需要其他处理，这里暂且忽略
+        }
+    }
     
     //生成新评论
     const newComment = {
@@ -402,7 +419,7 @@ const createStallComment = (config)=>{
         rating: commentData.rating,
         like: 0,
         content: commentData.content,
-        pictrue1Url: commentData.pictrue1Url || '',
+        picture1Url: commentData.picture1Url || '',
         picture2Url: commentData.picture2Url || '',
         picture3Url: commentData.picture3Url || ''
     }
@@ -464,3 +481,6 @@ const evaluationComment = (config)=>{
 }
 
 export default {getMyComments, deleteComment, getStallCommentList, createStallComment, evaluationComment}
+
+// 导出评论数据库供其他模块使用
+export {commentDataBase}

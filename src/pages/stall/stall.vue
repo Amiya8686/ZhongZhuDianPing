@@ -21,6 +21,7 @@ const commentForm = ref({
   content: '',
   images: []
 })
+const fileList = ref([])
 const uploadRef = ref(null)
 
 // 上传图片前的校验
@@ -92,14 +93,17 @@ const submitComment = async () => {
   }
   
   try {
-    await proxy.$foodApi.createStallComment({
-      stallID: stallID.value,
-      rating: commentForm.value.rating,
-      content: commentForm.value.content,
-      pictrue1Url: '',
-      picture2Url: '',
-      picture3Url: ''
+    const formData = new FormData()
+    formData.append('stallID', stallID.value)
+    formData.append('rating', commentForm.value.rating)
+    formData.append('content', commentForm.value.content)
+    
+    // 添加图片文件
+    fileList.value.forEach((file) => {
+      formData.append('files', file.raw)
     })
+
+    await proxy.$foodApi.createStallComment(formData)
     alert('评论成功！')
     dialogVisible.value = false
     commentForm.value = {
@@ -107,6 +111,7 @@ const submitComment = async () => {
       content: '',
       images: []
     }
+    fileList.value = [] // 清空文件列表
     pageIndex.value = 1
     await loadData() // 刷新档口数据（包含评论）
   } catch (error) {
@@ -267,7 +272,7 @@ const scrollRight = () => {
             <div class="dish-list" ref="scrollContainer">
               <div class="dish-card" v-for="dish in dishList" :key="dish.ID">
                 <div class="dish-img">
-                  <img :src="dish.pictrueUrl || dish.pictureUrl" alt="菜品图片" />
+                  <img :src="dish.pictureUrl || dish.pictureUrl" alt="菜品图片" />
                   <span class="recommend-tag">推荐 {{ dish.rating || 4.5 }}分</span>
                 </div>
                 <div class="dish-info">
@@ -304,11 +309,11 @@ const scrollRight = () => {
                 <div class="comment-text">{{ comment.content }}</div>
 
                 <!-- 评论图片 -->
-                <div class="comment-imgs" v-if="comment.pictrue1Url">
+                <div class="comment-imgs" v-if="comment.picture1Url">
                   <el-image
-                    v-if="comment.pictrue1Url"
-                    :src="comment.pictrue1Url"
-                    :preview-src-list="[comment.pictrue1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
+                    v-if="comment.picture1Url"
+                    :src="comment.picture1Url"
+                    :preview-src-list="[comment.picture1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
                     :initial-index="0"
                     fit="cover"
                     class="c-img"
@@ -316,7 +321,7 @@ const scrollRight = () => {
                   <el-image 
                     v-if="comment.picture2Url" 
                     :src="comment.picture2Url" 
-                    :preview-src-list="[comment.pictrue1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
+                    :preview-src-list="[comment.picture1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
                     :initial-index="1"
                     fit="cover" 
                     class="c-img"
@@ -324,7 +329,7 @@ const scrollRight = () => {
                   <el-image 
                     v-if="comment.picture3Url" 
                     :src="comment.picture3Url" 
-                    :preview-src-list="[comment.pictrue1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
+                    :preview-src-list="[comment.picture1Url, comment.picture2Url, comment.picture3Url].filter(Boolean)"
                     :initial-index="2"
                     fit="cover" 
                     class="c-img"
@@ -373,6 +378,7 @@ const scrollRight = () => {
         <el-form-item label="图片">
           <el-upload 
             ref="uploadRef"
+            v-model:file-list="fileList"
             action="#" 
             list-type="picture-card" 
             :auto-upload="false"

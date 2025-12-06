@@ -1,5 +1,8 @@
 //这里定义涉及美食档口请求的mock的返回函数
 
+// 导入评论数据库
+import { commentDataBase } from './comment.js'
+
 //将url查询参数转为JS对象
 function parseURLParams(url) {
   const searchParams = new URL(url).searchParams;
@@ -272,67 +275,58 @@ const getStallInfo = (config)=>{
             name: stall.signatureDish,
             price: stall.meanPrice,
             rating: Number(stall.rating.toFixed(1)),
-            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         },
         {
             ID: stallID * 100 + 2,
             name: '招牌套餐',
             price: stall.meanPrice + 5,
             rating: Number((stall.rating - 0.1).toFixed(1)),
-            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
         },
         {
             ID: stallID * 100 + 3,
             name: '超值单人餐',
             price: stall.meanPrice - 2,
             rating: Number((stall.rating - 0.2).toFixed(1)),
-            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         },
         {
             ID: stallID * 100 + 4,
             name: '特色小吃',
             price: 8,
             rating: Number((stall.rating - 0.3).toFixed(1)),
-            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
         },
         {
             ID: stallID * 100 + 5,
             name: '饮料',
             price: 5,
             rating: Number((stall.rating - 0.5).toFixed(1)),
-            pictrueUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         }
     ]
     
-    // 按照API文档生成热门评论列表（至多2个）
-    const commentList = [
-        {
-            ID: stallID * 10 + 1,
-            reviewerName: '美食达人',
-            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            dateTime: '2025-11-28 12:30:00',
-            rating: 5,
-            like: 88,
-            evaluation: 'none',
-            content: `${stall.name}的${stall.signatureDish}真的很好吃，推荐大家来试试！`,
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-            picture3Url: ''
-        },
-        {
-            ID: stallID * 10 + 2,
-            reviewerName: '吃货小王',
-            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-            dateTime: '2025-11-27 18:15:00',
-            rating: 4.5,
-            like: 56,
-            evaluation: 'none',
-            content: '环境不错，味道也很好，性价比高！',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-            picture2Url: '',
-            picture3Url: ''
-        }
-    ]
+    // 从commentDataBase中查询该档口的评论，按点赞数排序，取前2条作为热门评论
+    const stallComments = commentDataBase
+        .filter(comment => comment.stallID === stallID)
+        .sort((a, b) => b.like - a.like)
+        .slice(0, 2)
+    
+    // 将评论数据转换为API文档要求的格式
+    const commentList = stallComments.map(comment => ({
+        ID: comment.ID,
+        reviewerName: comment.userId, // 使用userId作为reviewerName
+        avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg', // 默认头像
+        dateTime: comment.dateTime,
+        rating: comment.rating,
+        like: comment.like,
+        evaluation: 'none',
+        content: comment.content,
+        picture1Url: comment.picture1Url || '',
+        picture2Url: comment.picture2Url || '',
+        picture3Url: comment.picture3Url || ''
+    }))
     
     return {
         code:200,

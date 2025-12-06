@@ -52,7 +52,7 @@ const getStallCommentList = (params)=>{
 }
 
 //发表对档口的评论
-//输入: object commentData {stallID, rating, content, pictrue1Url, picture2Url, picture3Url}
+//输入: FormData commentData (包含 stallID, rating, content, files)
 //输出: promise对象
 //成功: resolve()
 //失败: reject(errorMessage)
@@ -62,6 +62,9 @@ const createStallComment = (commentData)=>{
         url:"/food/createStallComment",
         method:"post",
         data:commentData,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     }
     return request(option)
 }
