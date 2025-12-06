@@ -136,13 +136,13 @@ onMounted(() => {
           </div>
           
           <!-- 图片区域 -->
-          <div v-if="comment.picture1Url || comment.picture2Url || comment.picture3Url" class="imageArea">
+          <div v-if="comment.pictrue1Url || comment.picture2Url || comment.picture3Url" class="imageArea">
             <div 
-              v-if="comment.picture1Url"
+              v-if="comment.pictrue1Url"
               class="imageItem"
-              @click="handlePreviewImage(comment.picture1Url)"
+              @click="handlePreviewImage(comment.pictrue1Url)"
             >
-              <img :src="comment.picture1Url" alt="图片1">
+              <img :src="comment.pictrue1Url" alt="图片1">
             </div>
             <div 
               v-if="comment.picture2Url"

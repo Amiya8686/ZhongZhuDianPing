@@ -32,6 +32,8 @@ const loadUserList = async () => {
         const data = await proxy.$userManageApi.getUserList(params)
         userList.value = data.userList
         totalPages.value = data.totalPageNum
+        // 同步 currentPage 为返回的页码
+        currentPage.value = data.pageIndex || currentPage.value
     } catch (error) {
         ElMessage.error('获取用户列表失败')
         console.error(error)
@@ -132,14 +134,13 @@ const handleConfirmAction = async () => {
     try {
         if (confirmDialogType.value === 'freeze') {
             await proxy.$userManageApi.freezeAccount(pendingUser.value.userName)
-            pendingUser.value.status = '冻结'
             ElMessage.success('冻结成功')
         } else {
             await proxy.$userManageApi.defrostAccount(pendingUser.value.userName)
-            pendingUser.value.status = '启用'
             ElMessage.success('解冻成功')
         }
-        await loadUserList() // 刷新列表
+        // 重新加载数据以保证一致性，不手动维护
+        await loadUserList()
     } catch (error) {
         ElMessage.error('操作失败')
         console.error(error)

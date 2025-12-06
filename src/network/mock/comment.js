@@ -374,7 +374,7 @@ const getStallCommentList = (config)=>{
 }
 
 //创建档口评论
-//输入: config对象，body中包含{stallID, rating, content, picture1Url, picture2Url, picture3Url}
+//输入: config对象，body中包含{stallID, rating, content, picture1, picture2, picture3}
 //输出: 响应对象
 //成功: {code: 200, msg: "评论成功"}
 //失败: {code: 998, msg: "token unvalid"}

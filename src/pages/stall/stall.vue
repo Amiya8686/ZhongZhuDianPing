@@ -18,8 +18,7 @@ const likedComments = ref(new Set()) // 记录已点赞的评论 ID
 const dialogVisible = ref(false)
 const commentForm = ref({
   rating: 5,
-  content: '',
-  images: []
+  content: ''
 })
 const fileList = ref([])
 const uploadRef = ref(null)
@@ -98,18 +97,17 @@ const submitComment = async () => {
     formData.append('rating', commentForm.value.rating)
     formData.append('content', commentForm.value.content)
     
-    // 添加图片文件
-    fileList.value.forEach((file) => {
-      formData.append('files', file.raw)
-    })
+    // 按照接口规定添加图片文件：picture1, picture2, picture3
+    if (fileList.value.length > 0) formData.append('picture1', fileList.value[0].raw)
+    if (fileList.value.length > 1) formData.append('picture2', fileList.value[1].raw)
+    if (fileList.value.length > 2) formData.append('picture3', fileList.value[2].raw)
 
     await proxy.$foodApi.createStallComment(formData)
     alert('评论成功！')
     dialogVisible.value = false
     commentForm.value = {
       rating: 5,
-      content: '',
-      images: []
+      content: ''
     }
     fileList.value = [] // 清空文件列表
     pageIndex.value = 1
@@ -151,23 +149,22 @@ const likeComment = async (comment) => {
     console.log('[点赞] 请求参数:', { commentID: comment.ID, newEvaluation })
     
     // 调用点赞API
-    const res = await proxy.$foodApi.evaluationComment({ 
+    await proxy.$foodApi.evaluationComment({ 
       commentID: comment.ID, 
       newEvaluation: newEvaluation 
     })
     
-    console.log('[点赞] API返回:', res)
-    
     // 更新本地状态
     if (isLiked) {
       likedComments.value.delete(comment.ID)
-      comment.like = res.like // 更新点赞数
     } else {
       likedComments.value.add(comment.ID)
-      comment.like = res.like // 更新点赞数
     }
     
-    console.log(`${isLiked ? '取消点赞' : '点赞'}成功，当前点赞数: ${comment.like}`)
+    console.log(`${isLiked ? '取消点赞' : '点赞'}成功`)
+    
+    // 重新加载档口数据以获取最新点赞数
+    await loadData()
   } catch (error) {
     console.error('点赞失败，详细错误:', error)
     alert(`点赞失败: ${error}`)
@@ -240,7 +237,6 @@ const scrollRight = () => {
               <div class="stall-stats">
                 <el-rate v-model="stallInfo.rating" disabled show-score text-color="#ff9900" score-template="{value}分"/>
                 <span class="price">￥{{ stallInfo.meanPrice }}/人</span>
-                <el-tag type="warning" effect="dark" class="tag">{{ stallInfo.type }}</el-tag>
               </div>
             </div>
 
