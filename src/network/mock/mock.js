@@ -5,7 +5,9 @@ import Mock from "mockjs"
 import user from "./user.js"
 import comment from "./comment.js"
 import food from "./food.js"
+import stallManage from "@/network/mock/background/stallManage.js"
 import requestConfig from "@/config/requestConfig.js";
+
 
 //后台管理mock引入
 import admin from "@/network/mock/background/admin"
@@ -37,6 +39,14 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/user\/freezeAccount/,"post",options=>{return userManage.freezeAccount(options)});
     Mock.mock(/\/api\/background\/user\/defrostAccount/,"post",options=>{return userManage.defrostAccount(options)});
     Mock.mock(/\/api\/background\/user\/retSetPassword/,"post",options=>{return userManage.resetPassword(options)});
+    Mock.mock(/\/api\/background\/food\/getStallList/,"get",options=>{return stallManage.getStallList(options)});
+    Mock.mock(/\/api\/background\/food\/addStall/,"post",options=>{return stallManage.addStall(options)});
+    Mock.mock(/\/api\/background\/food\/editStallInfo/,"post",options=>{return stallManage.editStallInfo(options)});
+    Mock.mock(/\/api\/background\/food\/deleteStall/,"post",options=>{return stallManage.deleteStall(options)});
+    Mock.mock(/\/api\/background\/dish\/getDishList/,"get",options=>{return stallManage.getDishList(options)});
+    Mock.mock(/\/api\/background\/dish\/addDish/,"post",options=>{return stallManage.addDish(options)});
+    Mock.mock(/\/api\/background\/dish\/editDishInfo/,"post",options=>{return stallManage.editDishInfo(options)});
+    Mock.mock(/\/api\/background\/dish\/deleteDish/,"post",options=>{return stallManage.deleteDish(options)});
 }
 
 

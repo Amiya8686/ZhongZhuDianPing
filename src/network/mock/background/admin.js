@@ -39,7 +39,7 @@ const checkToken = (config)=>{
     if(token){
         const ID = token
         const index = adminDataBase.find(item=>{return item.ID===ID})
-        if(index!=-1){
+        if(index){
             return ID
         }
     }
@@ -144,4 +144,4 @@ const adminEditInfo = (config)=>{
 }
 
 
-export default {adminLogin,checkTokenApi,getAdminInfo,adminEditPassword,adminEditInfo}
+export default {parseURLParams,adminLogin,checkTokenApi,getAdminInfo,adminEditPassword,adminEditInfo,checkToken}
