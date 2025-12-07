@@ -12,7 +12,6 @@ const commentList = ref([]) // 评论列表
 const pageIndex = ref(1)  // 当前评论页码
 const loading = ref(true) // 加载状态
 const isShowBody = ref(false) // 是否显示页面内容
-const likedComments = ref(new Set()) // 记录已点赞的评论 ID
 
 // 写评论相关
 const dialogVisible = ref(false)
@@ -142,9 +141,9 @@ const viewPanorama = () => {
 // 点赞评论
 const likeComment = async (comment) => {
   try {
-    // 检查是否已点赞
-    const isLiked = likedComments.value.has(comment.ID)
-    const newEvaluation = isLiked ? 'unlike' : 'like'
+    // 根据评论自身的 evaluation 字段判断是否已点赞
+    const isLiked = comment.evaluation === 'like'
+    const newEvaluation = isLiked ? 'none' : 'like'
     
     console.log('[点赞] 请求参数:', { commentID: comment.ID, newEvaluation })
     
@@ -154,12 +153,8 @@ const likeComment = async (comment) => {
       newEvaluation: newEvaluation 
     })
     
-    // 更新本地状态
-    if (isLiked) {
-      likedComments.value.delete(comment.ID)
-    } else {
-      likedComments.value.add(comment.ID)
-    }
+    // 更新本地状态（仅标记 evaluation，点赞数通过刷新获取）
+    comment.evaluation = newEvaluation
     
     console.log(`${isLiked ? '取消点赞' : '点赞'}成功`)
     
@@ -173,7 +168,8 @@ const likeComment = async (comment) => {
 
 // 检查评论是否已点赞
 const isCommentLiked = (commentID) => {
-  return likedComments.value.has(commentID)
+  const target = commentList.value.find(item => item.ID === commentID)
+  return target?.evaluation === 'like'
 }
 
 // 页面挂载时执行
