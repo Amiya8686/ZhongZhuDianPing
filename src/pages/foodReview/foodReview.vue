@@ -1,6 +1,6 @@
 <script setup>
 import {ref,getCurrentInstance,onMounted} from "vue"
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, StarFilled } from '@element-plus/icons-vue'
 const {proxy} = getCurrentInstance()
 
 
@@ -122,7 +122,7 @@ const handlePageChange = (page) => {
 
 //跳转到档口详情页
 const goToStall = (stallID) => {
-  window.location.href = `/foodReview/stall?stallID=${stallID}`
+  window.open(`/foodReview/stall.html?stallID=${stallID}`, '_blank');
 }
 
 //跳转到主页
@@ -219,9 +219,10 @@ onMounted(()=>{
           <el-button
             v-for="category in categories"
             :key="category"
-            :type="selectedCategory === category ? 'success' : 'warning'"
+            :type="selectedCategory === category ? 'primary' : ''"
+            :plain="selectedCategory !== category"
             @click="handleCategoryClick(category)"
-            size="default"
+            round
           >
             {{ category }}
           </el-button>
@@ -235,9 +236,10 @@ onMounted(()=>{
           <el-button
             v-for="location in locations"
             :key="location"
-            :type="selectedLocation === location ? 'success' : 'warning'"
+            :type="selectedLocation === location ? 'primary' : ''"
+            :plain="selectedLocation !== location"
             @click="handleLocationClick(location)"
-            size="default"
+            round
           >
             {{ location }}
           </el-button>
@@ -247,29 +249,38 @@ onMounted(()=>{
 
     <!-- 排序区域 -->
     <div class="sort-section">
-      <el-select
-        v-model="collation"
-        placeholder="排序规则"
-        @change="handleCollationChange"
-        class="sort-select"
-      >
-        <el-option label="降序" value="descend"></el-option>
-        <el-option label="升序" value="ascend"></el-option>
-      </el-select>
-
-      <el-button
-        :type="sortBy === 'rating' ? 'primary' : 'warning'"
-        @click="handleSortByChange('rating')"
-      >
-        评分
-      </el-button>
-
-      <el-button
-        :type="sortBy === 'price' ? 'primary' : 'warning'"
-        @click="handleSortByChange('price')"
-      >
-        价格
-      </el-button>
+      <div class="sort-left">
+        <span class="sort-label">排序方式：</span>
+        <el-button-group>
+          <el-button
+            :type="sortBy === 'rating' ? 'primary' : ''"
+            :plain="sortBy !== 'rating'"
+            @click="handleSortByChange('rating')"
+          >
+            评分优先
+          </el-button>
+          <el-button
+            :type="sortBy === 'price' ? 'primary' : ''"
+            :plain="sortBy !== 'price'"
+            @click="handleSortByChange('price')"
+          >
+            价格优先
+          </el-button>
+        </el-button-group>
+      </div>
+      
+      <div class="sort-right">
+        <el-select
+          v-model="collation"
+          placeholder="排序规则"
+          @change="handleCollationChange"
+          class="sort-select"
+          size="large"
+        >
+          <el-option label="从高到低" value="descend"></el-option>
+          <el-option label="从低到高" value="ascend"></el-option>
+        </el-select>
+      </div>
     </div>
 
     <!-- 档口列表 -->
@@ -283,23 +294,36 @@ onMounted(()=>{
         <!-- 左侧图片 -->
         <div class="stall-image">
           <img :src="stall.pictureUrl" alt="档口图片" />
+          <!-- 高分推荐标签(标准可修改) -->
+          <div class="stall-tag" v-if="stall.rating >= 4.5">高分推荐</div>
         </div>
 
         <!-- 右侧信息 -->
         <div class="stall-info">
-          <!-- 档口名 -->
-          <div class="stall-name">{{ stall.name }}</div>
-
-          <!-- 评分与价格 -->
-          <div class="stall-stats">
-            <span>评分：{{ stall.rating }}</span>
-            <span style="margin-left: 20px;">人均价格：￥{{ stall.meanPrice }}</span>
+          <!-- 头部：名称与评分 -->
+          <div class="info-header">
+            <div class="stall-name">{{ stall.name }}</div>
+            <div class="stall-rating">
+              <el-icon color="#ff9800" size="20"><StarFilled /></el-icon>
+              <span class="rating-score">{{ stall.rating }}</span>
+            </div>
           </div>
 
-          <!-- 地点和招牌菜 -->
-          <div class="stall-details">
-            <div class="detail-item">地点：{{ stall.canteen }}</div>
-            <div class="detail-item">招牌菜：{{ stall.signatureDish }}</div>
+          <!-- 中部：标签与价格 -->
+          <div class="info-body">
+            <div class="stall-tags">
+              <el-tag size="small" effect="plain" type="info">{{ stall.canteen }}</el-tag>
+              <el-tag size="small" effect="light" type="warning">招牌: {{ stall.signatureDish }}</el-tag>
+            </div>
+            <div class="stall-price">
+              <span class="price-label">人均</span>
+              <span class="price-value">￥{{ stall.meanPrice }}</span>
+            </div>
+          </div>
+
+          <!-- 底部：操作或描述（预留，目前可以放简单的描述或空着） -->
+          <div class="info-footer">
+             <el-button type="primary" link @click.stop="goToStall(stall.ID)">查看详情 ></el-button>
           </div>
         </div>
       </div>
@@ -325,7 +349,8 @@ onMounted(()=>{
 .body {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-color: #f5f7fa;
+  padding-bottom: 40px;
 }
 
 /* 顶部导航栏 */
@@ -337,8 +362,11 @@ onMounted(()=>{
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .title {
@@ -349,27 +377,25 @@ onMounted(()=>{
 }
 
 .title:hover {
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .main-title {
   font-size: 24px;
   color: white;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
 .sub-title {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
   margin-top: 2px;
 }
 
 .right-section {
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 
 .user-info {
@@ -378,14 +404,17 @@ onMounted(()=>{
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    padding: 5px 15px;
+    padding: 6px 12px;
     border-radius: 20px;
     transition: background-color 0.3s;
     outline: none;
-    border: none;
     
     &:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &:focus, &:focus-visible {
+      outline: none;
     }
     
     .user-name {
@@ -400,24 +429,14 @@ onMounted(()=>{
   }
 }
 
-.avatar {
-  cursor: pointer;
-  background-color: #ff9800;
-  transition: transform 0.3s;
-}
-
-.avatar:hover {
-  transform: scale(1.1);
-}
-
 /* 筛选区域 */
 .filter-section {
   background: white;
   padding: 25px 40px;
   margin: 20px auto;
-  max-width: 1400px;
+  max-width: 1200px;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
@@ -432,11 +451,10 @@ onMounted(()=>{
 }
 
 .filter-label {
-  min-width: 80px;
-  font-size: 16px;
-  color: #333;
+  min-width: 60px;
+  font-size: 15px;
+  color: #606266;
   font-weight: 600;
-  text-align: left;
   margin-right: 20px;
 }
 
@@ -449,71 +467,90 @@ onMounted(()=>{
 /* 排序区域 */
 .sort-section {
   background: white;
-  padding: 20px 40px;
+  padding: 15px 40px;
   margin: 20px auto;
-  max-width: 1400px;
+  max-width: 1200px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
+.sort-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.sort-label {
+  font-size: 14px;
+  color: #606266;
+}
+
 .sort-select {
-  width: 150px;
+  width: 140px;
 }
 
 /* 档口列表 */
 .stall-list {
-  max-width: 1400px;
-  margin: 30px auto;
-  padding: 0 40px;
+  max-width: 1200px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .stall-card {
   background: white;
   border-radius: 12px;
-  padding: 0;
-  margin-bottom: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 950px;
+  padding: 20px;
   display: flex;
-  overflow: hidden;
+  gap: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #ebeef5;
 }
 
 .stall-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: #dcdfe6;
 }
 
 /* 左侧图片 */
 .stall-image {
-  width: 220px;
-  height: 220px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  flex-shrink: 0;
+  width: 240px;
+  height: 180px;
+  border-radius: 8px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
+  flex-shrink: 0;
 }
 
 .stall-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.5s;
 }
 
 .stall-card:hover .stall-image img {
-  transform: scale(1.1);
+  transform: scale(1.05);
+}
+
+.stall-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 152, 0, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 /* 右侧信息 */
@@ -522,120 +559,88 @@ onMounted(()=>{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 25px;
-  max-width: 600px;
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .stall-name {
-  background: #667eea;
-  color: white;
   font-size: 22px;
   font-weight: bold;
-  padding: 12px 20px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  color: #303133;
+  margin-bottom: 8px;
 }
 
-.stall-stats {
-  background: white;
-  color: #333;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 12px 20px;
-  border-radius: 8px;
-  margin-bottom: 12px;
+.stall-rating {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border: 1px solid #e0e0e0;
+  gap: 5px;
+  background: #fff7e6;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
-.stall-stats span:first-child {
+.rating-score {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: bold;
   color: #ff9800;
 }
 
-.stall-stats span:last-child {
-  color: #e74c3c;
-  font-weight: 600;
-}
-
-.stall-details {
-  display: flex;
-  gap: 15px;
-}
-
-.detail-item {
-  background: white;
-  color: #555;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 12px 20px;
-  border-radius: 8px;
+.info-body {
+  margin-top: 10px;
   flex: 1;
-  text-align: center;
-  border: 1px solid #e0e0e0;
+}
+
+.stall-tags {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.stall-price {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.price-label {
+  font-size: 13px;
+  color: #909399;
+}
+
+.price-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #f56c6c;
+}
+
+.info-footer {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #f0f2f5;
+  padding-top: 15px;
+  margin-top: 10px;
 }
 
 /* 分页区域 */
 .pagination-section {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 40px 0 60px;
-  margin-top: 20px;
+  padding: 40px 0;
 }
 
-/* Element Plus 按钮样式覆盖 */
-:deep(.el-button) {
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-:deep(.el-button--warning) {
-  background: #e0e0e0;
-  border: 1px solid #ccc;
-  color: #666;
-}
-
-:deep(.el-button--warning:hover) {
-  background: #d0d0d0;
-  border-color: #bbb;
-}
-
-:deep(.el-button--success) {
-  background: #667eea;
-  border: none;
-  color: white;
-}
-
-:deep(.el-button--success:hover) {
-  background: #5568d3;
-  transform: translateY(-1px);
-}
-
+/* Element Plus 样式覆盖 */
 :deep(.el-button--primary) {
-  background: #667eea;
-  border: none;
-  color: white;
+  --el-button-bg-color: #667eea;
+  --el-button-border-color: #667eea;
+  --el-button-hover-bg-color: #5a6fd6;
+  --el-button-hover-border-color: #5a6fd6;
 }
 
-:deep(.el-button--primary:hover) {
-  background: #5568d3;
-  transform: translateY(-1px);
-}
-
-/* 分页样式 */
 :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background-color: #667eea;
 }
-
-:deep(.el-pagination.is-background .el-pager li:hover) {
-  color: #667eea;
-}
-
 </style>

@@ -20,16 +20,16 @@ const getStallList = (params)=>{
 }
 
 //获取档口的详细信息
-//输入: number stallID
+//输入: object params {stallID}
 //输出: promise对象
 //成功: resolve({档口详细信息, dishList, commentList})
 //失败: reject(errorMessage)
-const getStallInfo = (stallID)=>{
+const getStallInfo = (params)=>{
     const option = {
         baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
         url:"/food/getStallInfo",
         method:"get",
-        data:{stallID},
+        data:params,
     }
     return request(option)
 }
@@ -52,7 +52,7 @@ const getStallCommentList = (params)=>{
 }
 
 //发表对档口的评论
-//输入: object commentData {stallID, rating, content, pictrue1Url, picture2Url, picture3Url}
+//输入: FormData commentData (包含 stallID, rating, content, files)
 //输出: promise对象
 //成功: resolve()
 //失败: reject(errorMessage)
@@ -62,6 +62,9 @@ const createStallComment = (commentData)=>{
         url:"/food/createStallComment",
         method:"post",
         data:commentData,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     }
     return request(option)
 }
@@ -84,16 +87,16 @@ const evaluationComment = (params)=>{
 //============= 档口菜品相关的接口 =============
 
 //获取全部菜品列表
-//输入: number stallID
+//输入: object params {stallID}
 //输出: promise对象
-//成功: resolve({dishList: Array})
+//成功: resolve(Array) - 直接返回菜品数组
 //失败: reject(errorMessage)
-const getStallDishList = (stallID)=>{
+const getStallDishList = (params)=>{
     const option = {
         baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
         url:"/food/getStallDishList",
         method:"get",
-        data:{stallID},
+        data:params,
     }
     return request(option)
 }
