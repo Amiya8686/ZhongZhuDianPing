@@ -21,6 +21,7 @@ const commentDataBase = [
     dateTime: '2025-11-10 12:30:45',
     rating: 5.0,
     like: 23,
+    evaluation: 'none',
     content: '这家店的菜品真的很不错，味道很正宗，服务态度也很好，环境优雅，价格合理，非常推荐大家来尝试！',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
@@ -35,6 +36,7 @@ const commentDataBase = [
     dateTime: '2025-11-09 18:20:30',
     rating: 4.0,
     like: 15,
+    evaluation: 'none',
     content: '麻辣烫的味道还可以，选择挺多的，就是人有点多需要排队。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
@@ -49,6 +51,7 @@ const commentDataBase = [
     dateTime: '2025-11-08 13:15:20',
     rating: 5.0,
     like: 30,
+    evaluation: 'none',
     content: '汉堡超级好吃！肉饼很厚实，配菜新鲜，薯条也很脆，性价比很高！',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
@@ -64,6 +67,7 @@ const commentDataBase = [
     dateTime: '2025-11-20 12:00:00',
     rating: 5.0,
     like: 88,
+    evaluation: 'none',
     content: '这家的汉堡真的是我在学校吃过最好吃的！肉汁丰富，面包松软。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
@@ -78,6 +82,7 @@ const commentDataBase = [
     dateTime: '2025-11-19 18:30:00',
     rating: 4.5,
     like: 45,
+    evaluation: 'like',
     content: '薯条很脆，但是可乐有点没气了，总体好评。',
     picture1Url: '',
     picture2Url: '',
@@ -92,6 +97,7 @@ const commentDataBase = [
     dateTime: '2025-11-18 11:45:00',
     rating: 5.0,
     like: 32,
+    evaluation: 'none',
     content: '双层芝士牛肉堡简直是热量炸弹，但是太快乐了！',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '',
@@ -106,6 +112,7 @@ const commentDataBase = [
     dateTime: '2025-11-07 19:45:10',
     rating: 3.0,
     like: 8,
+    evaluation: 'none',
     content: '面条味道一般，汤头有点咸，不过价格便宜。',
     picture1Url: '',
     picture2Url: '',
@@ -120,6 +127,7 @@ const commentDataBase = [
     dateTime: '2025-11-06 12:00:00',
     rating: 4.0,
     like: 18,
+    evaluation: 'none',
     content: '黄焖鸡做得不错，鸡肉很嫩，酱汁入味，配菜丰富，值得一试。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
@@ -134,6 +142,7 @@ const commentDataBase = [
     dateTime: '2025-11-05 11:30:00',
     rating: 5.0,
     like: 42,
+    evaluation: 'none',
     content: '非常棒的体验！',
     picture1Url: '',
     picture2Url: '',
@@ -148,6 +157,7 @@ const commentDataBase = [
     dateTime: '2025-11-04 14:20:00',
     rating: 4.0,
     like: 12,
+    evaluation: 'none',
     content: '性价比不错，下次还会来。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '',
@@ -162,6 +172,7 @@ const commentDataBase = [
     dateTime: '2025-11-03 17:30:00',
     rating: 5.0,
     like: 35,
+    evaluation: 'none',
     content: '超级满意！强烈推荐给大家，环境卫生，服务周到，价格实惠。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
@@ -176,6 +187,7 @@ const commentDataBase = [
     dateTime: '2025-11-02 12:45:00',
     rating: 3.0,
     like: 5,
+    evaluation: 'none',
     content: '一般般吧，没有特别出彩的地方。',
     picture1Url: '',
     picture2Url: '',
@@ -190,6 +202,7 @@ const commentDataBase = [
     dateTime: '2025-11-01 13:00:00',
     rating: 4.0,
     like: 20,
+    evaluation: 'none',
     content: '味道还不错，就是等待时间有点长。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     picture2Url: '',
@@ -204,6 +217,7 @@ const commentDataBase = [
     dateTime: '2025-10-31 18:00:00',
     rating: 5.0,
     like: 28,
+    evaluation: 'none',
     content: '太好吃了！每次来都很满意，店家态度很好。',
     picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
     picture2Url: '',
@@ -218,6 +232,7 @@ const commentDataBase = [
     dateTime: '2025-10-30 15:30:00',
     rating: 4.0,
     like: 16,
+    evaluation: 'none',
     content: '口味适中，分量足，值得一试。',
     picture1Url: '',
     picture2Url: '',
@@ -361,10 +376,9 @@ const getStallCommentList = (config)=>{
     const endIndex = startIndex + numPerPage
     // 映射评论数据，添加 evaluation 字段
     const comments = stallComments.slice(startIndex, endIndex).map(comment => {
-        const likedBy = comment.likedBy || []
         return {
             ...comment,
-            evaluation: likedBy.includes(userName) ? 'like' : 'none'
+            evaluation: comment.evaluation || 'none'
         }
     })
     
@@ -470,27 +484,27 @@ const evaluationComment = (config)=>{
         }
     }
     
-    // 初始化likedBy
-    if (!comment.likedBy) {
-        comment.likedBy = []
+    // 初始化 evaluation
+    if (!comment.evaluation) {
+        comment.evaluation = 'none'
     }
     
     //处理点赞逻辑
     if(newEvaluation === 'like'){
-        if (!comment.likedBy.includes(userName)) {
+        if (comment.evaluation !== 'like') {
             comment.like += 1
-            comment.likedBy.push(userName)
-            console.log(`[evaluationComment] 用户${userName}点赞了评论${commentID}，当前点赞数: ${comment.like}`)
+            comment.evaluation = 'like'
+            console.log(`[evaluationComment] 用户点赞了评论${commentID}，当前点赞数: ${comment.like}`)
         } else {
-            console.log(`[evaluationComment] 用户${userName}重复点赞评论${commentID}，忽略`)
+            console.log(`[evaluationComment] 用户重复点赞评论${commentID}，忽略`)
         }
     }else if(newEvaluation === 'none' || newEvaluation === 'unlike'){
-        if (comment.likedBy.includes(userName)) {
+        if (comment.evaluation === 'like') {
             comment.like = Math.max(0, comment.like - 1)
-            comment.likedBy = comment.likedBy.filter(u => u !== userName)
-            console.log(`[evaluationComment] 用户${userName}取消点赞评论${commentID}，当前点赞数: ${comment.like}`)
+            comment.evaluation = 'none'
+            console.log(`[evaluationComment] 用户取消点赞评论${commentID}，当前点赞数: ${comment.like}`)
         } else {
-            console.log(`[evaluationComment] 用户${userName}重复取消点赞评论${commentID}，忽略`)
+            console.log(`[evaluationComment] 用户重复取消点赞评论${commentID}，忽略`)
         }
     }
     

@@ -63,9 +63,9 @@ const tokenVerify = async () => {
 }
 
 // 加载数据
-const loadData = async () => {
+const loadData = async (isBackground = false) => {
   if(!stallID.value) return
-  loading.value = true
+  if (!isBackground) loading.value = true
 
   try {
     // 调用getStallInfo获取档口详情（包含推荐菜和热门评论）
@@ -79,7 +79,7 @@ const loadData = async () => {
   } catch (error) {
     console.error("加载档口数据失败:", error)
   } finally {
-    loading.value = false
+    if (!isBackground) loading.value = false
   }
 }
 
@@ -153,13 +153,10 @@ const likeComment = async (comment) => {
       newEvaluation: newEvaluation 
     })
     
-    // 更新本地状态（仅标记 evaluation，点赞数通过刷新获取）
-    comment.evaluation = newEvaluation
-    
     console.log(`${isLiked ? '取消点赞' : '点赞'}成功`)
     
-    // 重新加载档口数据以获取最新点赞数
-    await loadData()
+    // 重新加载档口数据以获取最新点赞数（静默刷新）
+    await loadData(true)
   } catch (error) {
     console.error('点赞失败，详细错误:', error)
     alert(`点赞失败: ${error}`)

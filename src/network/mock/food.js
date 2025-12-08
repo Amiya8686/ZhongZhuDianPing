@@ -315,7 +315,6 @@ const getStallInfo = (config)=>{
     
     // 将评论数据转换为API文档要求的格式
     const commentList = stallComments.map(comment => {
-        const likedBy = comment.likedBy || []
         return {
             ID: comment.ID,
             reviewerName: comment.userId, // 使用userId作为reviewerName
@@ -323,7 +322,7 @@ const getStallInfo = (config)=>{
             dateTime: comment.dateTime,
             rating: comment.rating,
             like: comment.like,
-            evaluation: likedBy.includes(userName) ? 'like' : 'none',
+            evaluation: comment.evaluation || 'none',
             content: comment.content,
             picture1Url: comment.picture1Url || '',
             picture2Url: comment.picture2Url || '',
