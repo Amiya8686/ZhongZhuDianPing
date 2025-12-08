@@ -314,19 +314,22 @@ const getStallInfo = (config)=>{
         .slice(0, 2)
     
     // 将评论数据转换为API文档要求的格式
-    const commentList = stallComments.map(comment => ({
-        ID: comment.ID,
-        reviewerName: comment.userId, // 使用userId作为reviewerName
-        avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg', // 默认头像
-        dateTime: comment.dateTime,
-        rating: comment.rating,
-        like: comment.like,
-        evaluation: 'none',
-        content: comment.content,
-        picture1Url: comment.picture1Url || '',
-        picture2Url: comment.picture2Url || '',
-        picture3Url: comment.picture3Url || ''
-    }))
+    const commentList = stallComments.map(comment => {
+        const likedBy = comment.likedBy || []
+        return {
+            ID: comment.ID,
+            reviewerName: comment.userId, // 使用userId作为reviewerName
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg', // 默认头像
+            dateTime: comment.dateTime,
+            rating: comment.rating,
+            like: comment.like,
+            evaluation: likedBy.includes(userName) ? 'like' : 'none',
+            content: comment.content,
+            picture1Url: comment.picture1Url || '',
+            picture2Url: comment.picture2Url || '',
+            picture3Url: comment.picture3Url || ''
+        }
+    })
     
     return {
         code:200,

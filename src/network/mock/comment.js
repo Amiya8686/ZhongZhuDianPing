@@ -359,7 +359,14 @@ const getStallCommentList = (config)=>{
     const totalPageNum = Math.ceil(totalComments / numPerPage)
     const startIndex = (pageIndex - 1) * numPerPage
     const endIndex = startIndex + numPerPage
-    const comments = stallComments.slice(startIndex, endIndex)
+    // 映射评论数据，添加 evaluation 字段
+    const comments = stallComments.slice(startIndex, endIndex).map(comment => {
+        const likedBy = comment.likedBy || []
+        return {
+            ...comment,
+            evaluation: likedBy.includes(userName) ? 'like' : 'none'
+        }
+    })
     
     console.log(`[getStallCommentList] 档口${stallID}的评论，总数${totalComments}条，第${pageIndex}页，共${totalPageNum}页`)
     
@@ -463,13 +470,28 @@ const evaluationComment = (config)=>{
         }
     }
     
+    // 初始化likedBy
+    if (!comment.likedBy) {
+        comment.likedBy = []
+    }
+    
     //处理点赞逻辑
     if(newEvaluation === 'like'){
-        comment.like += 1
-        console.log(`[evaluationComment] 用户${userName}点赞了评论${commentID}，当前点赞数: ${comment.like}`)
-    }else if(newEvaluation === 'unlike'){
-        comment.like = Math.max(0, comment.like - 1)
-        console.log(`[evaluationComment] 用户${userName}取消点赞评论${commentID}，当前点赞数: ${comment.like}`)
+        if (!comment.likedBy.includes(userName)) {
+            comment.like += 1
+            comment.likedBy.push(userName)
+            console.log(`[evaluationComment] 用户${userName}点赞了评论${commentID}，当前点赞数: ${comment.like}`)
+        } else {
+            console.log(`[evaluationComment] 用户${userName}重复点赞评论${commentID}，忽略`)
+        }
+    }else if(newEvaluation === 'none' || newEvaluation === 'unlike'){
+        if (comment.likedBy.includes(userName)) {
+            comment.like = Math.max(0, comment.like - 1)
+            comment.likedBy = comment.likedBy.filter(u => u !== userName)
+            console.log(`[evaluationComment] 用户${userName}取消点赞评论${commentID}，当前点赞数: ${comment.like}`)
+        } else {
+            console.log(`[evaluationComment] 用户${userName}重复取消点赞评论${commentID}，忽略`)
+        }
     }
     
     return {
