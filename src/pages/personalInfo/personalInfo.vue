@@ -1,7 +1,6 @@
 <script setup>
 import {reactive, getCurrentInstance, onMounted, ref} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
-import { ElMessage } from "element-plus"
 const {proxy} = getCurrentInstance()
 
 //用户信息
