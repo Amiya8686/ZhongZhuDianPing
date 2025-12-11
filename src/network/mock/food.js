@@ -1,5 +1,8 @@
 //这里定义涉及美食档口请求的mock的返回函数
 
+// 导入评论数据库
+import { commentDataBase } from './comment.js'
+
 //将url查询参数转为JS对象
 function parseURLParams(url) {
   const searchParams = new URL(url).searchParams;
@@ -263,14 +266,44 @@ const getStallInfo = (config)=>{
         }
     }
     
-    //模拟推荐菜品列表
+    console.log(`[getStallInfo] 获取档口${stallID}的详细信息`)
+    
+    // 推荐菜品列表
     const dishList = [
         {
-            ID: 1,
+            ID: stallID * 100 + 1,
             name: stall.signatureDish,
             price: stall.meanPrice,
-            rating: stall.rating,
-            pictrueUrl: stall.pictureUrl
+            rating: Number(stall.rating.toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: stallID * 100 + 2,
+            name: '招牌套餐',
+            price: stall.meanPrice + 5,
+            rating: Number((stall.rating - 0.1).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: stallID * 100 + 3,
+            name: '超值单人餐',
+            price: stall.meanPrice - 2,
+            rating: Number((stall.rating - 0.2).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: stallID * 100 + 4,
+            name: '特色小吃',
+            price: 8,
+            rating: Number((stall.rating - 0.3).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: stallID * 100 + 5,
+            name: '饮料',
+            price: 5,
+            rating: Number((stall.rating - 0.5).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         }
     ]
     
@@ -294,7 +327,14 @@ const getStallInfo = (config)=>{
     return {
         code:200,
         data:{
-            ...stall,
+            ID: stall.ID,
+            name: stall.name,
+            rating: stall.rating,
+            meanPrice: stall.meanPrice,
+            introduction: stall.introduction,
+            canteent: stall.canteen,
+            signatureDish: stall.signatureDish,
+            pictureUrl: stall.pictureUrl,
             dishList: dishList,
             commentList: commentList
         }

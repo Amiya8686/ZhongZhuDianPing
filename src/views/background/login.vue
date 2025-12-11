@@ -111,8 +111,8 @@ const handleCancel = ()=>{
 
 <style scoped lang="less">
 .loginPage{
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: url('/src/assets/imgs/background/BingWallpaper.jpg') center/cover no-repeat;
     display: flex;
     justify-content: center;

@@ -71,7 +71,9 @@ onMounted(()=>{
 }
 .right-main{
     display: flex;
-    padding:1px 0 0 1px;
+    padding: 0;
+    flex: 1;
+    overflow-x: hidden;
 }
 
 /* 验证等待样式 */
