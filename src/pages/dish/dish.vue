@@ -59,6 +59,7 @@ const getStallIDFromURL = () => {
 //加载菜品列表
 const loadDishList = async () => {
   try {
+    console.log("loadDishLiST")
     const data = await proxy.$foodApi.getStallDishList(stallID.value)
     dishList.value = data.dishList || []
     //根据排序方式排序

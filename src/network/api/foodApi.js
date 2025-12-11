@@ -91,12 +91,12 @@ const evaluationComment = (params)=>{
 //输出: promise对象
 //成功: resolve(Array) - 直接返回菜品数组
 //失败: reject(errorMessage)
-const getStallDishList = (params)=>{
+const getStallDishList = (stallID)=>{
     const option = {
         baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
         url:"/food/getStallDishList",
         method:"get",
-        data:params,
+        data:{stallID},
     }
     return request(option)
 }
