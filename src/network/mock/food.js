@@ -5,12 +5,19 @@ import { commentDataBase } from './comment.js'
 
 //将url查询参数转为JS对象
 function parseURLParams(url) {
-  const searchParams = new URL(url).searchParams;
-  const params = {};
-  for (const [key, value] of searchParams.entries()) {
-    params[key] = value;
+  try {
+    // 兼容相对路径和绝对路径
+    const urlObj = new URL(url, 'http://localhost');
+    const searchParams = urlObj.searchParams;
+    const params = {};
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+    return params;
+  } catch (e) {
+    console.error('URL解析失败:', e);
+    return {};
   }
-  return params;
 }
 
 //模拟档口数据库
@@ -425,9 +432,28 @@ const evaluateDish = (config) => {
     
     console.log(`[evaluateDish] 用户${userName}对菜品${dishID}评价为${newEvaluation}`)
     
-    //更新菜品评价状态
+    //更新菜品评价状态和计数
     if(dishDatabase[dishID]){
-        dishDatabase[dishID].evaluation = newEvaluation
+        const dish = dishDatabase[dishID]
+        const oldEvaluation = dish.evaluation
+        
+        // 更新计数
+        // 先移除旧评价的影响
+        if (oldEvaluation === 'like') {
+            dish.like = Math.max(0, dish.like - 1)
+        } else if (oldEvaluation === 'bad') {
+            dish.bad = Math.max(0, dish.bad - 1)
+        }
+        
+        // 添加新评价的影响
+        if (newEvaluation === 'like') {
+            dish.like++
+        } else if (newEvaluation === 'bad') {
+            dish.bad++
+        }
+        
+        // 更新状态
+        dish.evaluation = newEvaluation
     }
     
     return {
@@ -616,6 +642,7 @@ initCommentDatabase()
 //成功: {code: 200, data: {commentList: Array, totalPageNum: number, pageIndex: number}}
 //失败: {code: 998, msg: "token unvalid"}
 const getStallCommentList = (config) => {
+    console.log('[Mock] getStallCommentList request:', config.url);
     const userName = checkToken(config)
     
     if(!userName){
@@ -630,10 +657,34 @@ const getStallCommentList = (config) => {
     const numPerPage = parseInt(search.numPerPage) || 10
     const pageIndex = parseInt(search.pageIndex) || 1
     
-    console.log(`[getStallCommentList] 获取档口${stallID}的评论列表，第${pageIndex}页`)
+    console.log(`[getStallCommentList] 获取档口${stallID}的评论列表，第${pageIndex}页，每页${numPerPage}条`)
+    
+    // 确保 commentDatabase 有数据，如果没有则重新初始化
+    if (Object.keys(commentDatabase).length === 0) {
+        console.warn('[getStallCommentList] commentDatabase 为空，重新初始化')
+        initCommentDatabase()
+    }
     
     //返回所有评论（实际应该根据stallID筛选）
     const allComments = Object.values(commentDatabase)
+    
+    // 如果还是空，强制添加一些测试数据
+    if (allComments.length === 0) {
+        console.warn('[getStallCommentList] 依然为空，使用强制数据')
+        allComments.push({
+            ID: 999,
+            reviewerName: '测试用户',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-12-12 12:00:00',
+            rating: 5.0,
+            like: 10,
+            evaluation: 'none',
+            content: '这是一条强制显示的测试评论，如果你看到这条消息，说明Mock数据初始化有问题。',
+            pictrue1Url: '',
+            picture2Url: '',
+            picture3Url: ''
+        })
+    }
     
     //计算分页
     const total = allComments.length
@@ -641,6 +692,8 @@ const getStallCommentList = (config) => {
     const startIndex = (pageIndex - 1) * numPerPage
     const endIndex = startIndex + numPerPage
     const commentList = allComments.slice(startIndex, endIndex)
+    
+    console.log(`[getStallCommentList] 返回 ${commentList.length} 条评论`)
     
     return {
         code: 200,
@@ -677,9 +730,24 @@ const evaluationComment = (config) => {
     
     console.log(`[evaluationComment] 用户${userName}对评论${commentID}评价为${newEvaluation}`)
     
-    //更新评论评价状态
+    //更新评论评价状态和计数
     if(commentDatabase[commentID]){
-        commentDatabase[commentID].evaluation = newEvaluation
+        const comment = commentDatabase[commentID]
+        const oldEvaluation = comment.evaluation
+        
+        // 更新计数
+        // 先移除旧评价的影响
+        if (oldEvaluation === 'like') {
+            comment.like = Math.max(0, comment.like - 1)
+        }
+        
+        // 添加新评价的影响
+        if (newEvaluation === 'like') {
+            comment.like++
+        }
+        
+        // 更新状态
+        comment.evaluation = newEvaluation
     }
     
     return {

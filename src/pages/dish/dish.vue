@@ -35,6 +35,7 @@ const tokenVerify = async () => {
     isShowBody.value = true
   } catch (error) {
     console.log(error)
+    isShowBody.value = true 
   }
 }
 
@@ -59,14 +60,13 @@ const getStallIDFromURL = () => {
 //加载菜品列表
 const loadDishList = async () => {
   try {
-    console.log("loadDishLiST")
+    console.log("loadDishList")
     const data = await proxy.$foodApi.getStallDishList(stallID.value)
     dishList.value = data.dishList || []
     //根据排序方式排序
     sortDishList()
   } catch (error) {
     console.error('获取菜品列表失败', error)
-    ElMessage.error('获取菜品列表失败')
   }
 }
 
@@ -106,25 +106,10 @@ const handleEvaluate = async (dish, type) => {
       newEvaluation: newEvaluation
     })
     
-    //更新本地数据
-    if (dish.evaluation === 'like') {
-      dish.like--
-    } else if (dish.evaluation === 'bad') {
-      dish.bad--
-    }
-    
-    dish.evaluation = newEvaluation
-    
-    if (newEvaluation === 'like') {
-      dish.like++
-    } else if (newEvaluation === 'bad') {
-      dish.bad++
-    }
-    
-    ElMessage.success('操作成功')
+    // 重新加载列表以获取最新数据
+    loadDishList()
   } catch (error) {
     console.error('评价失败', error)
-    ElMessage.error('操作失败')
   }
 }
 
@@ -150,17 +135,17 @@ const goToHome = () => {
 
 //跳转到个人中心
 const goToPersonalInfo = () => {
-  window.location.href = '/user/personalInfo'
+  window.open('/user/personalInfo')
 }
 
 //跳转到修改密码页
 const goToEditPassword = () => {
-  window.location.href = '/user/editPassword'
+  window.open('/user/editPassword')
 }
 
 //跳转到我的评论页
 const goToMyComment = () => {
-  window.location.href = '/user/myComment'
+  window.open('/user/myComment')
 }
 
 //退出登录
@@ -226,36 +211,32 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- 面包屑导航 -->
-    <div class="breadcrumb-section">
-      <span class="breadcrumb-item" @click="goToFoodReview">美食点评</span>
-      <span class="breadcrumb-separator">→</span>
-      <span class="breadcrumb-item" @click="goToStall">档口详情</span>
-      <span class="breadcrumb-separator">→</span>
-      <span class="breadcrumb-current">全部菜品</span>
-    </div>
-
     <!-- 排序按钮区域 -->
     <div class="sort-section">
-      <span class="sort-label">排序方式</span>
-      <el-button
-        :type="sortBy === 'like' ? 'success' : 'warning'"
-        @click="handleSortChange('like')"
-      >
-        赞
-      </el-button>
-      <el-button
-        :type="sortBy === 'bad' ? 'success' : 'warning'"
-        @click="handleSortChange('bad')"
-      >
-        踩
-      </el-button>
-      <el-button
-        :type="sortBy === 'default' ? 'success' : 'warning'"
-        @click="handleSortChange('default')"
-      >
-        默认
-      </el-button>
+      <span class="sort-label">📊 排序方式</span>
+      <div class="sort-btns">
+        <el-button
+          :type="sortBy === 'like' ? 'success' : 'default'"
+          round
+          @click="handleSortChange('like')"
+        >
+          👍 最多赞
+        </el-button>
+        <el-button
+          :type="sortBy === 'bad' ? 'warning' : 'default'"
+          round
+          @click="handleSortChange('bad')"
+        >
+          👎 最多踩
+        </el-button>
+        <el-button
+          :type="sortBy === 'default' ? 'primary' : 'default'"
+          round
+          @click="handleSortChange('default')"
+        >
+          默认排序
+        </el-button>
+      </div>
     </div>
 
     <!-- 菜品网格 -->
@@ -268,30 +249,33 @@ onMounted(() => {
         <!-- 菜品图片 -->
         <div class="dish-image">
           <img :src="dish.pictureUrl" alt="菜品图片" />
+          <div class="dish-tag">🍽️</div>
         </div>
 
-        <!-- 菜品名称 -->
-        <div class="dish-name">{{ dish.name }}</div>
-
-        <!-- 菜品价格 -->
-        <div class="dish-price">￥{{ dish.price }}</div>
-
-        <!-- 评价按钮 -->
-        <div class="dish-actions">
-          <button
-            class="action-btn踩"
-            :class="{ active: dish.evaluation === 'bad' }"
-            @click="handleEvaluate(dish, 'bad')"
-          >
-            踩 {{ dish.bad }}
-          </button>
-          <button
-            class="action-btn赞"
-            :class="{ active: dish.evaluation === 'like' }"
-            @click="handleEvaluate(dish, 'like')"
-          >
-            赞 {{ dish.like }}
-          </button>
+        <!-- 菜品内容 -->
+        <div class="dish-content">
+          <div class="dish-name">{{ dish.name }}</div>
+          <div class="dish-price">￥{{ dish.price }}</div>
+          
+          <!-- 评价按钮 -->
+          <div class="dish-actions">
+            <button
+              class="action-btn action-btn-like"
+              :class="{ active: dish.evaluation === 'like' }"
+              @click="handleEvaluate(dish, 'like')"
+            >
+              <span class="icon">👍</span>
+              <span>{{ dish.like }}</span>
+            </button>
+            <button
+              class="action-btn action-btn-bad"
+              :class="{ active: dish.evaluation === 'bad' }"
+              @click="handleEvaluate(dish, 'bad')"
+            >
+              <span class="icon">👎</span>
+              <span>{{ dish.bad }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -316,19 +300,21 @@ onMounted(() => {
 .body {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-color: #fef6e4;
+  background-image: radial-gradient(#f3d2c1 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 /* 顶部导航栏 */
 .top-bar {
   width: 100%;
   height: 70px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff8e3c;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 142, 60, 0.3);
   box-sizing: border-box;
 }
 
@@ -346,8 +332,8 @@ onMounted(() => {
 .main-title {
   font-size: 24px;
   color: white;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 800;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
   letter-spacing: 2px;
 }
 
@@ -371,18 +357,20 @@ onMounted(() => {
     cursor: pointer;
     padding: 5px 15px;
     border-radius: 20px;
-    transition: background-color 0.3s;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
     outline: none;
     border: none;
     
     &:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
     }
     
     .user-name {
       font-size: 14px;
       color: white;
-      font-weight: 500;
+      font-weight: 600;
     }
     
     .el-icon {
@@ -391,169 +379,176 @@ onMounted(() => {
   }
 }
 
-/* 面包屑导航 */
-.breadcrumb-section {
-  max-width: 1400px;
-  margin: 20px auto;
-  padding: 15px 40px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  font-size: 16px;
-  color: #666;
-}
-
-.breadcrumb-item {
-  cursor: pointer;
-  color: #667eea;
-  transition: color 0.3s;
-  
-  &:hover {
-    color: #5568d3;
-    text-decoration: underline;
-  }
-}
-
-.breadcrumb-separator {
-  margin: 0 8px;
-  color: #999;
-}
-
-.breadcrumb-current {
-  color: #333;
-  font-weight: 600;
-}
-
 /* 排序按钮区域 */
 .sort-section {
-  max-width: 1400px;
-  margin: 20px auto;
-  padding: 15px 40px;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px 30px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .sort-label {
-  font-size: 16px;
+  font-size: 18px;
   color: #333;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.sort-btns {
+  display: flex;
+  gap: 15px;
 }
 
 /* 菜品网格 */
 .dish-grid {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 30px auto;
-  padding: 0 40px;
+  padding: 0 20px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
 }
 
 .dish-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
   
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
   }
 }
 
 /* 菜品图片 */
 .dish-image {
   width: 100%;
-  height: 200px;
-  background: #f5c842;
-  border-radius: 8px;
+  height: 220px;
+  background: #f0f0f0;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 15px;
+  position: relative;
   
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s;
   }
+  
+  &:hover img {
+    transform: scale(1.1);
+  }
+  
+  .dish-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.dish-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 菜品名称 */
 .dish-name {
-  background: #f5c842;
   color: #333;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  padding: 12px;
-  border-radius: 8px;
-  text-align: center;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 /* 菜品价格 */
 .dish-price {
-  background: #f5c842;
-  color: #e74c3c;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 12px;
-  border-radius: 8px;
+  color: #ff5e62;
+  font-size: 22px;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 /* 评价按钮 */
 .dish-actions {
   display: flex;
-  gap: 10px;
+  gap: 15px;
+  margin-top: auto;
 }
 
-.action-btn踩,
-.action-btn赞 {
+.action-btn {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
-}
-
-.action-btn踩 {
-  background: #e67e22;
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   
-  &:hover {
-    background: #d35400;
-    transform: translateY(-2px);
-  }
-  
-  &.active {
-    background: #d35400;
-    box-shadow: 0 4px 8px rgba(211, 84, 0, 0.4);
+  .icon {
+    font-size: 18px;
   }
 }
 
-.action-btn赞 {
-  background: #27ae60;
-  color: white;
+.action-btn-bad {
+  background: #f1f3f5;
+  color: #868e96;
   
   &:hover {
-    background: #229954;
-    transform: translateY(-2px);
+    background: #e9ecef;
+    color: #495057;
   }
   
   &.active {
-    background: #229954;
-    box-shadow: 0 4px 8px rgba(34, 153, 84, 0.4);
+    background: #ffe3e3;
+    color: #e03131;
+    
+    .icon {
+      transform: scale(1.2);
+    }
+  }
+}
+
+.action-btn-like {
+  background: #fff4e6;
+  color: #ff922b;
+  
+  &:hover {
+    background: #ffe8cc;
+    color: #fd7e14;
+  }
+  
+  &.active {
+    background: #ffec99;
+    color: #f08c00;
+    
+    .icon {
+      transform: scale(1.2);
+    }
   }
 }
 
@@ -563,46 +558,20 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   padding: 40px 0 60px;
-  margin-top: 20px;
-}
-
-/* Element Plus 按钮样式覆盖 */
-:deep(.el-button) {
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-:deep(.el-button--warning) {
-  background: #e0e0e0;
-  border: 1px solid #ccc;
-  color: #666;
-}
-
-:deep(.el-button--warning:hover) {
-  background: #d0d0d0;
-  border-color: #bbb;
-}
-
-:deep(.el-button--success) {
-  background: #667eea;
-  border: none;
-  color: white;
-}
-
-:deep(.el-button--success:hover) {
-  background: #5568d3;
-  transform: translateY(-1px);
 }
 
 /* 分页样式 */
 :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff8e3c;
   color: white;
+  border-radius: 8px;
 }
 
-:deep(.el-pagination.is-background .el-pager li:hover) {
-  color: #667eea;
+:deep(.el-pagination.is-background .el-pager li) {
+  border-radius: 8px;
+  &:hover {
+    color: #ff8e3c;
+  }
 }
 
 /* 响应式设计 */

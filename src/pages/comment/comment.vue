@@ -35,6 +35,7 @@ const tokenVerify = async () => {
     isShowBody.value = true
   } catch (error) {
     console.log(error)
+    isShowBody.value = true
   }
 }
 
@@ -59,17 +60,18 @@ const getStallIDFromURL = () => {
 //加载评论列表
 const loadCommentList = async () => {
   try {
+    console.log('开始加载评论列表，stallID:', stallID.value)
     const params = {
       stallID: stallID.value,
       numPerPage: numPerPage.value,
       pageIndex: pageIndex.value
     }
     const data = await proxy.$foodApi.getStallCommentList(params)
+    console.log('获取到的评论数据:', data)
     commentList.value = data.commentList || []
     totalPageNum.value = data.totalPageNum || 0
   } catch (error) {
     console.error('获取评论列表失败', error)
-    ElMessage.error('获取评论列表失败')
   }
 }
 
@@ -84,18 +86,10 @@ const handleLikeComment = async (comment) => {
       newEvaluation: newEvaluation
     })
     
-    //更新本地数据
-    if (comment.evaluation === 'like') {
-      comment.like--
-    } else {
-      comment.like++
-    }
-    comment.evaluation = newEvaluation
-    
-    ElMessage.success('操作成功')
+    // 重新加载列表以获取最新数据
+    loadCommentList()
   } catch (error) {
     console.error('点赞失败', error)
-    ElMessage.error('操作失败')
   }
 }
 
@@ -132,17 +126,17 @@ const goToHome = () => {
 
 //跳转到个人中心
 const goToPersonalInfo = () => {
-  window.location.href = '/user/personalInfo'
+  window.open('/user/personalInfo')
 }
 
 //跳转到修改密码页
 const goToEditPassword = () => {
-  window.location.href = '/user/editPassword'
+  window.open('/user/editPassword')
 }
 
 //跳转到我的评论页
 const goToMyComment = () => {
-  window.location.href = '/user/myComment'
+  window.open('/user/myComment')
 }
 
 //退出登录
@@ -208,13 +202,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- 面包屑导航 -->
-    <div class="breadcrumb-section">
-      <span class="breadcrumb-item" @click="goToFoodReview">美食点评</span>
-      <span class="breadcrumb-separator">→</span>
-      <span class="breadcrumb-item" @click="goToStall">档口详情</span>
-      <span class="breadcrumb-separator">→</span>
-      <span class="breadcrumb-current">全部评论</span>
+    <!-- 评论列表标题 -->
+    <div class="page-header">
+      <span class="header-icon">💬</span>
+      <h2>全部评论</h2>
     </div>
 
     <!-- 评论列表 -->
@@ -225,21 +216,23 @@ onMounted(() => {
         :key="comment.ID"
       >
         <!-- 头像 -->
-        <div class="comment-avatar">
-          <el-avatar :src="comment.avatarUrl" :size="60"></el-avatar>
+        <div class="comment-avatar-wrapper">
+          <el-avatar :src="comment.avatarUrl" :size="60" class="comment-avatar"></el-avatar>
         </div>
 
         <!-- 评论信息区域 -->
         <div class="comment-info-section">
           <!-- 顶部信息栏 -->
           <div class="comment-header">
-            <div class="header-item">{{ comment.reviewerName }}</div>
-            <div class="header-item">评分：{{ comment.rating }}</div>
-            <div class="header-item">{{ comment.dateTime }}</div>
+            <div class="reviewer-name">{{ comment.reviewerName }}</div>
+            <div class="rating-badge">⭐ {{ comment.rating }}分</div>
+            <div class="comment-time">{{ comment.dateTime }}</div>
           </div>
 
           <!-- 评论内容 -->
-          <div class="comment-content">{{ comment.content }}</div>
+          <div class="comment-content-bubble">
+            {{ comment.content }}
+          </div>
 
           <!-- 评论图片 -->
           <div class="comment-images">
@@ -273,7 +266,8 @@ onMounted(() => {
               :class="{ active: comment.evaluation === 'like' }"
               @click="handleLikeComment(comment)"
             >
-              点赞，点赞数 {{ comment.like }}
+              <span class="icon">👍</span>
+              <span>点赞 ({{ comment.like }})</span>
             </button>
           </div>
         </div>
@@ -310,19 +304,21 @@ onMounted(() => {
 .body {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-color: #fef6e4;
+  background-image: radial-gradient(#f3d2c1 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 /* 顶部导航栏 */
 .top-bar {
   width: 100%;
   height: 70px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff8e3c;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 142, 60, 0.3);
   box-sizing: border-box;
 }
 
@@ -340,8 +336,8 @@ onMounted(() => {
 .main-title {
   font-size: 24px;
   color: white;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 800;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
   letter-spacing: 2px;
 }
 
@@ -365,18 +361,20 @@ onMounted(() => {
     cursor: pointer;
     padding: 5px 15px;
     border-radius: 20px;
-    transition: background-color 0.3s;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
     outline: none;
     border: none;
     
     &:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
     }
     
     .user-name {
       font-size: 14px;
       color: white;
-      font-weight: 500;
+      font-weight: 600;
     }
     
     .el-icon {
@@ -385,68 +383,64 @@ onMounted(() => {
   }
 }
 
-/* 面包屑导航 */
-.breadcrumb-section {
-  max-width: 1400px;
-  margin: 20px auto;
-  padding: 15px 40px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  font-size: 16px;
-  color: #666;
-}
-
-.breadcrumb-item {
-  cursor: pointer;
-  color: #667eea;
-  transition: color 0.3s;
+/* 页面标题 */
+.page-header {
+  max-width: 1000px;
+  margin: 30px auto 10px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   
-  &:hover {
-    color: #5568d3;
-    text-decoration: underline;
+  .header-icon {
+    font-size: 28px;
   }
-}
-
-.breadcrumb-separator {
-  margin: 0 8px;
-  color: #999;
-}
-
-.breadcrumb-current {
-  color: #333;
-  font-weight: 600;
+  
+  h2 {
+    color: #333;
+    font-size: 24px;
+    margin: 0;
+    font-weight: 700;
+  }
 }
 
 /* 评论列表 */
 .comment-list {
-  max-width: 1400px;
-  margin: 30px auto;
-  padding: 0 40px;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 0 20px;
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
 
 .comment-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
-  gap: 20px;
+  gap: 25px;
   position: relative;
   transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
   
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-color: #ff8e3c;
   }
 }
 
 /* 头像 */
-.comment-avatar {
+.comment-avatar-wrapper {
   flex-shrink: 0;
+  position: relative;
+  
+  .comment-avatar {
+    border: 3px solid #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* 评论信息区域 */
@@ -460,28 +454,42 @@ onMounted(() => {
 /* 顶部信息栏 */
 .comment-header {
   display: flex;
+  align-items: center;
   gap: 15px;
+  flex-wrap: wrap;
 }
 
-.header-item {
-  background: #f5c842;
+.reviewer-name {
+  font-size: 18px;
+  font-weight: 700;
   color: #333;
-  font-size: 16px;
+}
+
+.rating-badge {
+  background: #fff4e6;
+  color: #ff8e3c;
+  font-size: 14px;
   font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 8px;
-  white-space: nowrap;
+  padding: 4px 12px;
+  border-radius: 12px;
 }
 
-/* 评论内容 */
-.comment-content {
-  background: #f5c842;
-  color: #333;
-  font-size: 15px;
-  line-height: 1.8;
+.comment-time {
+  color: #999;
+  font-size: 14px;
+  margin-left: auto;
+}
+
+/* 评论内容气泡 */
+.comment-content-bubble {
+  background: #f8f9fa;
+  color: #555;
+  font-size: 16px;
+  line-height: 1.6;
   padding: 20px;
-  border-radius: 8px;
-  min-height: 80px;
+  border-radius: 0 16px 16px 16px;
+  position: relative;
+  border: 1px solid #e9ecef;
 }
 
 /* 评论图片 */
@@ -489,21 +497,24 @@ onMounted(() => {
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .image-item {
-  width: 280px;
-  height: 180px;
-  background: #f5c842;
-  border-radius: 8px;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   position: relative;
   transition: all 0.3s;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: #ff8e3c;
   }
   
   img {
@@ -517,30 +528,45 @@ onMounted(() => {
 .comment-actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: 10px;
 }
 
 .like-btn {
-  background: #e67e22;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 8px;
+  background: transparent;
+  color: #868e96;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  .icon {
+    font-size: 18px;
+  }
   
   &:hover {
-    background: #d35400;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(211, 84, 0, 0.4);
+    background: #fff4e6;
+    color: #ff8e3c;
+    border-color: #ff8e3c;
   }
   
   &.active {
-    background: #27ae60;
+    background: #ff8e3c;
+    color: white;
+    border-color: #ff8e3c;
     
     &:hover {
-      background: #229954;
+      background: #fd7e14;
+      border-color: #fd7e14;
+    }
+    
+    .icon {
+      transform: scale(1.2);
     }
   }
 }
@@ -556,29 +582,35 @@ onMounted(() => {
 
 /* Element Plus 分页样式 */
 :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff8e3c;
   color: white;
+  border-radius: 8px;
 }
 
-:deep(.el-pagination.is-background .el-pager li:hover) {
-  color: #667eea;
+:deep(.el-pagination.is-background .el-pager li) {
+  border-radius: 8px;
+  &:hover {
+    color: #ff8e3c;
+  }
 }
 
 /* 图片预览对话框样式 */
 :deep(.el-dialog) {
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff8e3c;
   color: white;
   padding: 20px;
+  margin-right: 0;
 }
 
 :deep(.el-dialog__title) {
   color: white;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 :deep(.el-dialog__close) {
@@ -591,25 +623,25 @@ onMounted(() => {
     flex-direction: column;
   }
   
-  .comment-avatar {
+  .comment-avatar-wrapper {
     align-self: flex-start;
-  }
-  
-  .image-item {
-    width: 220px;
-    height: 150px;
   }
 }
 
 @media (max-width: 768px) {
   .comment-header {
     flex-direction: column;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .comment-time {
+    margin-left: 0;
   }
   
   .image-item {
-    width: 100%;
-    height: 200px;
+    width: 100px;
+    height: 100px;
   }
 }
 </style>
