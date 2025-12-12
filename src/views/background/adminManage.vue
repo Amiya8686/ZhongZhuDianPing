@@ -5,6 +5,14 @@ import { Search, Refresh, UserFilled } from '@element-plus/icons-vue'
 
 const { proxy } = getCurrentInstance()
 
+// 当前登录的管理员信息
+const currentAdmin = ref({
+    ID: '',
+    name: '',
+    permission: '',
+    avatarUrl: ''
+})
+
 // 搜索条件
 const searchForm = ref({
     ID: '',
@@ -80,6 +88,11 @@ const addFormLoading = ref(false)
 
 // 打开新增对话框
 const handleAddAdmin = () => {
+    // 检查权限
+    if (!isSuperAdmin.value) {
+        ElMessage.warning('只有超级管理员才能新增管理员')
+        return
+    }
     addDialogVisible.value = true
 }
 
@@ -135,6 +148,19 @@ const closeDetailDialog = () => {
 // 重置密码
 const handleResetPassword = async () => {
     if (!detailAdmin.value) return
+    
+    // 检查权限
+    if (!isSuperAdmin.value) {
+        ElMessage.warning('只有超级管理员才能重置密码')
+        return
+    }
+    
+    // 不能重置自己的密码
+    if (isSelf(detailAdmin.value.ID)) {
+        ElMessage.warning('不能重置自己的密码')
+        return
+    }
+    
     try {
         const res = await proxy.$adminManageApi.resetAdminPassword({ ID: detailAdmin.value.ID })
         ElMessage.success(`已重置管理员「${detailAdmin.value.name}」的密码为：${res.newPassword}`)
@@ -147,6 +173,18 @@ const handleResetPassword = async () => {
 
 // 删除管理员
 const handleDeleteAdmin = (row) => {
+    // 检查权限
+    if (!isSuperAdmin.value) {
+        ElMessage.warning('只有超级管理员才能删除管理员')
+        return
+    }
+    
+    // 不能删除自己
+    if (isSelf(row.ID)) {
+        ElMessage.warning('不能删除自己的账号')
+        return
+    }
+    
     ElMessageBox.confirm(
         `确定要删除管理员「${row.name}」吗？此操作不可恢复！`,
         '删除提醒',
@@ -177,8 +215,33 @@ const handlePageChange = (page) => {
     loadAdminList()
 }
 
+// 获取当前登录管理员的信息
+const getCurrentAdminInfo = async () => {
+    try {
+        const data = await proxy.$adminApi.getAdminInfo()
+        currentAdmin.value.ID = data.ID
+        currentAdmin.value.name = data.name
+        currentAdmin.value.permission = data.permission
+        currentAdmin.value.avatarUrl = data.avatarUrl
+    } catch (error) {
+        ElMessage.error('获取当前管理员信息失败')
+        console.error(error)
+    }
+}
+
+// 检查是否是超级管理员
+const isSuperAdmin = computed(() => {
+    return currentAdmin.value.permission === '超级管理员'
+})
+
+// 检查是否是自己
+const isSelf = (adminID) => {
+    return currentAdmin.value.ID === adminID
+}
+
 // 页面加载时获取数据
 onMounted(() => {
+    getCurrentAdminInfo()
     loadAdminList()
 })
 </script>
@@ -231,7 +294,11 @@ onMounted(() => {
                 <div class="card-header">
                     <span class="header-title">管理员列表</span>
                     <div class="header-actions">
-                        <el-button type="success" @click="handleAddAdmin">新增</el-button>
+                        <el-button 
+                            type="success" 
+                            @click="handleAddAdmin"
+                            :disabled="!isSuperAdmin"
+                        >新增</el-button>
                         <el-button type="primary" link :icon="Refresh" @click="loadAdminList">刷新</el-button>
                     </div>
                 </div>
@@ -279,6 +346,7 @@ onMounted(() => {
                             type="danger"
                             link
                             size="small"
+                            :disabled="!isSuperAdmin || isSelf(row.ID)"
                             @click="handleDeleteAdmin(row)"
                         >删除</el-button>
                     </template>
@@ -408,7 +476,12 @@ onMounted(() => {
             <template #footer>
                 <div class="detail-footer">
                     <el-button @click="closeDetailDialog" size="large">取消</el-button>
-                    <el-button type="primary" @click="handleResetPassword" size="large">重置密码</el-button>
+                    <el-button 
+                        type="primary" 
+                        @click="handleResetPassword" 
+                        size="large"
+                        :disabled="!isSuperAdmin || (detailAdmin && isSelf(detailAdmin.ID))"
+                    >重置密码</el-button>
                 </div>
             </template>
         </el-dialog>
