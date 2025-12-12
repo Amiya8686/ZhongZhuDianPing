@@ -12,6 +12,7 @@ import requestConfig from "@/config/requestConfig.js";
 //后台管理mock引入
 import admin from "@/network/mock/background/admin"
 import userManage from "@/network/mock/background/userManage"
+import adminManage from "@/network/mock/background/adminManage"
 if(requestConfig.isMock){
     //客户端mock
     Mock.mock(/\/api\/user\/login/,"post",options=>{return user.login(options)});
@@ -48,4 +49,9 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/dish\/addDish/,"post",options=>{return stallManage.addDish(options)});
     Mock.mock(/\/api\/background\/dish\/editDishInfo/,"post",options=>{return stallManage.editDishInfo(options)});
     Mock.mock(/\/api\/background\/dish\/deleteDish/,"post",options=>{return stallManage.deleteDish(options)});
+    //管理员管理mock
+    Mock.mock(/\/api\/background\/adminManage\/getAdminList/,"get",options=>{return adminManage.getAdminList(options)});
+    Mock.mock(/\/api\/background\/adminManage\/addAdmin/,"post",options=>{return adminManage.addAdmin(options)});
+    Mock.mock(/\/api\/background\/adminManage\/deleteAdmin/,"post",options=>{return adminManage.deleteAdmin(options)});
+    Mock.mock(/\/api\/background\/adminManage\/resetPassword/,"post",options=>{return adminManage.resetAdminPassword(options)});
 }
