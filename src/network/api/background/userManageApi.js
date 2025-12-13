@@ -54,7 +54,7 @@ const defrostAccount = (userName) => {
 const resetPassword = (userName) => {
     const option = {
         baseURL: requestConfig.isMock ? requestConfig.mockURL : requestConfig.baseURL,
-        url: "/background/user/retSetPassword",
+        url: "/background/user/resetPassword",
         method: "post",
         data: { userName },
     }
