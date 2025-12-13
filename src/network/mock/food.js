@@ -1,5 +1,8 @@
 //这里定义涉及美食档口请求的mock的返回函数
 
+// 导入评论数据库
+import { commentDataBase } from './comment.js'
+
 //将url查询参数转为JS对象
 function parseURLParams(url) {
   const searchParams = new URL(url).searchParams;
@@ -263,41 +266,204 @@ const getStallInfo = (config)=>{
         }
     }
     
-    //模拟推荐菜品列表
+    console.log(`[getStallInfo] 获取档口${stallID}的详细信息`)
+    
+    // 推荐菜品列表
     const dishList = [
         {
-            ID: 1,
+            ID: stallID * 100 + 1,
             name: stall.signatureDish,
             price: stall.meanPrice,
-            rating: stall.rating,
-            pictrueUrl: stall.pictureUrl
+            rating: Number(stall.rating.toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: stallID * 100 + 2,
+            name: '招牌套餐',
+            price: stall.meanPrice + 5,
+            rating: Number((stall.rating - 0.1).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: stallID * 100 + 3,
+            name: '超值单人餐',
+            price: stall.meanPrice - 2,
+            rating: Number((stall.rating - 0.2).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: stallID * 100 + 4,
+            name: '特色小吃',
+            price: 8,
+            rating: Number((stall.rating - 0.3).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: stallID * 100 + 5,
+            name: '饮料',
+            price: 5,
+            rating: Number((stall.rating - 0.5).toFixed(1)),
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         }
     ]
     
-    //模拟热门评论列表
-    const commentList = [
-        {
-            ID: 1,
-            reviewerName: 'NiNa',
-            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            dateTime: '2025-11-15 12:30:45',
-            rating: 5.0,
-            like: 23,
-            content: '非常好吃，强烈推荐！',
-            pictrue1Url: '',
-            picture2Url: '',
-            picture3Url: ''
+    // 从commentDataBase中查询该档口的评论，按点赞数排序，取前2条作为热门评论
+    const stallComments = commentDataBase
+        .filter(comment => comment.stallID === stallID)
+        .sort((a, b) => b.like - a.like)
+        .slice(0, 2)
+    
+    // 将评论数据转换为API文档要求的格式
+    const commentList = stallComments.map(comment => {
+        return {
+            ID: comment.ID,
+            reviewerName: comment.userId, // 使用userId作为reviewerName
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg', // 默认头像
+            dateTime: comment.dateTime,
+            rating: comment.rating,
+            like: comment.like,
+            evaluation: comment.evaluation || 'none',
+            content: comment.content,
+            picture1Url: comment.picture1Url || '',
+            picture2Url: comment.picture2Url || '',
+            picture3Url: comment.picture3Url || ''
         }
-    ]
+    })
     
     return {
         code:200,
         data:{
-            ...stall,
+            ID: stall.ID,
+            name: stall.name,
+            rating: stall.rating,
+            meanPrice: stall.meanPrice,
+            introduction: stall.introduction,
+            canteent: stall.canteen,
+            signatureDish: stall.signatureDish,
+            pictureUrl: stall.pictureUrl,
             dishList: dishList,
             commentList: commentList
         }
     }
 }
 
-export default {getStallList, getStallInfo}
+//获取档口菜品列表
+//输入: config对象，查询参数包含{stallID}
+//输出: 响应对象
+//成功: {code: 200, data: Array}
+//失败: {code: 998, msg: "token unvalid"}
+const getStallDishList = (config)=>{
+    const userName = checkToken(config)
+    
+    if(!userName){
+        return {
+            code:998,
+            msg:"token unvalid",
+        }
+    }
+    
+    const search = parseURLParams(config.url)
+    const stallID = parseInt(search.stallID)
+    
+    const stall = stallDataBase.find(item => item.ID === stallID)
+    
+    if(!stall){
+        return {
+            code:200,
+            data:[]
+        }
+    }
+
+    // 针对 ID=3 (快乐汉堡) 返回特定的测试数据
+    if (stallID === 3) {
+        console.log('[getStallDishList] 返回档口3的特殊测试数据')
+        return {
+            code: 200,
+            data: [
+                {
+                    id: 301,
+                    name: '双层芝士牛肉堡',
+                    price: 22.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+                    recommendCount: 156
+                },
+                {
+                    id: 302,
+                    name: '香辣鸡腿堡',
+                    price: 18.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+                    recommendCount: 120
+                },
+                {
+                    id: 303,
+                    name: '大薯条',
+                    price: 12.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+                    recommendCount: 89
+                },
+                {
+                    id: 304,
+                    name: '冰可乐',
+                    price: 6.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+                    recommendCount: 200
+                },
+                {
+                    id: 305,
+                    name: '麦乐鸡块(5块)',
+                    price: 14.0,
+                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+                    recommendCount: 65
+                }
+            ]
+        }
+    }
+    
+    //模拟菜品数据
+    const dishes = [
+        {
+            id: stallID * 100 + 1,
+            name: stall.signatureDish,
+            price: stall.meanPrice,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            recommendCount: 100 + Math.floor(Math.random() * 50)
+        },
+        {
+            id: stallID * 100 + 2,
+            name: '招牌套餐A',
+            price: stall.meanPrice + 5,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            recommendCount: 80 + Math.floor(Math.random() * 20)
+        },
+        {
+            id: stallID * 100 + 3,
+            name: '超值单人餐',
+            price: stall.meanPrice - 2,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            recommendCount: 60 + Math.floor(Math.random() * 30)
+        },
+        {
+            id: stallID * 100 + 4,
+            name: '特色小吃',
+            price: 8,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            recommendCount: 40 + Math.floor(Math.random() * 10)
+        },
+        {
+            id: stallID * 100 + 5,
+            name: '清爽饮料',
+            price: 5,
+            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            recommendCount: 20 + Math.floor(Math.random() * 5)
+        }
+    ]
+    
+    console.log(`[getStallDishList] 档口${stallID}的菜品列表，共${dishes.length}个`)
+    
+    return {
+        code:200,
+        data: dishes
+    }
+}
+
+export default {getStallList, getStallInfo, getStallDishList}
