@@ -9,7 +9,7 @@ const backgroundCheckToken = ()=>{
     const option = {
         baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
         url:"/background/checkToken",
-        method:"post"
+        method:"get"
     }
     return request(option)
 }
