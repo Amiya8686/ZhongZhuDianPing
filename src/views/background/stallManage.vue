@@ -227,7 +227,7 @@ const dishForm = reactive({
   stallID:0,
   stallName:"",
   canteen:"",
-  ID:"",
+  ID:0,
   name:"",
   like:0,
   bad:0,
@@ -323,6 +323,9 @@ const handleDishConfirm = ()=>{
       const formData = new FormData()
       if(dishFormStatus.value==="编辑"){
         formData.append('ID',dishForm.ID)
+      }
+      if(dishFormStatus.value==="新增"){
+        formData.append('stallID',dishForm.stallID)
       }
       formData.append('name',dishForm.name)
       formData.append('price',dishForm.price)
