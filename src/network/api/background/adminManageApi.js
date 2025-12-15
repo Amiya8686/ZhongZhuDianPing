@@ -18,9 +18,9 @@ const getAdminList = (params) => {
 }
 
 //新增管理员
-//输入: object params {name: string, password: string, permission: string}
+//输入: object params {name: string, permission: string}
 //输出: promise对象
-//成功: resolve(none)
+//成功: resolve({ID: string, password: string})
 //失败: reject(errorMessage)
 const addAdmin = (params) => {
     const option = {

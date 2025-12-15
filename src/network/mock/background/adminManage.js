@@ -129,23 +129,26 @@ const addAdmin = (config) => {
         }
     }
 
-    const { name, password, permission } = JSON.parse(config.body)
+    const { name, permission } = JSON.parse(config.body)
 
     // 验证必填字段
-    if (!name || !password || !permission) {
+    if (!name || !permission) {
         return {
             code: 999,
-            msg: "姓名、密码和权限不能为空"
+            msg: "姓名和权限不能为空"
         }
     }
 
     // 生成新ID
     const newID = generateAdminID()
+    
+    // 生成初始密码（6位随机数字）
+    const initialPassword = String(Math.floor(100000 + Math.random() * 900000))
 
     // 创建新管理员
     const newAdmin = {
         ID: newID,
-        password: password,
+        password: initialPassword,
         permission: permission,
         name: name,
         avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg"
@@ -153,12 +156,13 @@ const addAdmin = (config) => {
 
     adminDatabase.push(newAdmin)
 
-    console.log(`[新增管理员] ID: ${newID}, 姓名: ${name}, 权限: ${permission}`)
+    console.log(`[新增管理员] ID: ${newID}, 姓名: ${name}, 权限: ${permission}, 初始密码: ${initialPassword}`)
 
     return {
         code: 200,
         data: {
-            ID: newID
+            ID: newID,
+            password: initialPassword
         }
     }
 }

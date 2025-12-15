@@ -70,6 +70,7 @@ const loadCommentList = async () => {
     console.log('获取到的评论数据:', data)
     commentList.value = data.commentList || []
     totalPageNum.value = data.totalPageNum || 0
+    pageIndex.value = data.pageIndex || pageIndex.value
   } catch (error) {
     console.error('获取评论列表失败', error)
   }

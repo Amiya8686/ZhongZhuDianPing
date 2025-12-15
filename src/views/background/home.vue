@@ -132,11 +132,11 @@ onMounted(() => {
     flex: 1;
     padding: 24px;
     background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-    min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     gap: 24px;
-    overflow-x: hidden;
+    overflow: hidden;
+    height: calc(100vh - 60px);
 }
 
 // 管理员信息卡片区域
@@ -292,6 +292,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    min-height: 0;
 }
 
 .feature-card {
@@ -301,6 +302,7 @@ onMounted(() => {
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
+    min-height: 0;
 
     &::before {
         content: '';

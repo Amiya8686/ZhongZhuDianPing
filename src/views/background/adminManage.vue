@@ -68,17 +68,12 @@ const handleReset = () => {
 const addDialogVisible = ref(false)
 const addForm = ref({
     name: '',
-    password: '',
     permission: '普通管理员'
 })
 const addFormRules = {
     name: [
         { required: true, message: '请输入姓名', trigger: 'blur' },
         { min: 1, max: 20, message: '姓名长度为1-20个字符', trigger: 'blur' }
-    ],
-    password: [
-        { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 6, max: 20, message: '密码长度为6-20个字符', trigger: 'blur' }
     ],
     permission: [
         { required: true, message: '请选择权限', trigger: 'change' }
@@ -113,8 +108,31 @@ const handleAddConfirm = () => {
         if (valid) {
             addFormLoading.value = true
             try {
-                await proxy.$adminManageApi.addAdmin(addForm.value)
-                ElMessage.success('新增管理员成功')
+                const res = await proxy.$adminManageApi.addAdmin(addForm.value)
+                ElMessageBox.alert(
+                    `<div style="background: #f5f7fa; padding: 25px; border-radius: 8px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <p style="font-size: 18px; margin-bottom: 20px; color: #303133; font-weight: 600;">创建成功</p>
+                            <div style="margin-bottom: 15px;">
+                                <div style="color: #909399; font-size: 14px; margin-bottom: 8px;">ID</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #303133;">${res.ID}</div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <div style="color: #909399; font-size: 14px; margin-bottom: 8px;">初始密码</div>
+                                <div style="font-size: 24px; font-weight: bold; color: #F56C6C; letter-spacing: 4px;">${res.password}</div>
+                            </div>
+                            <p style="color: #E6A23C; font-size: 13px; margin: 0;">请保管好密码</p>
+                        </div>
+                    </div>`,
+                    '',
+                    {
+                        dangerouslyUseHTMLString: true,
+                        confirmButtonText: '确定',
+                        showClose: false,
+                        center: true,
+                        customClass: 'custom-simple-box'
+                    }
+                )
                 closeAddDialog()
                 loadAdminList()
             } catch (error) {
@@ -186,13 +204,22 @@ const handleDeleteAdmin = (row) => {
     }
     
     ElMessageBox.confirm(
-        `确定要删除管理员「${row.name}」吗？此操作不可恢复！`,
-        '删除提醒',
+        `<div style="background: #fef0f0; padding: 25px; border-radius: 8px; border: 1px solid #fde2e2;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <p style="font-size: 18px; margin-bottom: 20px; color: #303133; font-weight: 600;">确定删除吗？</p>
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #303133;">${row.name}</div>
+                <div style="font-size: 14px; color: #909399; margin-bottom: 15px;">ID: ${row.ID}</div>
+                <p style="color: #F56C6C; font-size: 13px; margin: 0;">操作不可恢复</p>
+            </div>
+        </div>`,
+        '',
         {
-            type: 'warning',
+            dangerouslyUseHTMLString: true,
             confirmButtonText: '确认删除',
-            confirmButtonClass: 'el-button--danger',
             cancelButtonText: '取消',
+            center: true,
+            customClass: 'custom-simple-box',
+            showClose: false,
             closeOnClickModal: false
         }
     ).then(async () => {
@@ -297,7 +324,6 @@ onMounted(() => {
                         <el-button 
                             type="success" 
                             @click="handleAddAdmin"
-                            :disabled="!isSuperAdmin"
                         >新增</el-button>
                         <el-button type="primary" link :icon="Refresh" @click="loadAdminList">刷新</el-button>
                     </div>
@@ -311,16 +337,18 @@ onMounted(() => {
                 :header-cell-style="{ background: '#f5f7fa', color: '#606266', fontWeight: 'bold' }"
             >
                 <el-table-column prop="ID" label="ID" width="150" align="center" />
-                <el-table-column prop="name" label="姓名" min-width="150" align="center">
+                <el-table-column label="头像" width="80" align="center">
                     <template #default="{ row }">
-                        <div class="admin-cell">
-                            <el-avatar :size="36" :src="row.avatarUrl" class="admin-avatar">
-                                <template #error>
-                                    <el-icon :size="20"><UserFilled /></el-icon>
-                                </template>
-                            </el-avatar>
-                            <span>{{ row.name }}</span>
-                        </div>
+                        <el-avatar :size="36" :src="row.avatarUrl" class="admin-avatar">
+                            <template #error>
+                                <el-icon :size="20"><UserFilled /></el-icon>
+                            </template>
+                        </el-avatar>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="姓名" min-width="150">
+                    <template #default="{ row }">
+                        <span>{{ row.name }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="permission" label="权限" width="150" align="center">
@@ -346,7 +374,6 @@ onMounted(() => {
                             type="danger"
                             link
                             size="small"
-                            :disabled="!isSuperAdmin || isSelf(row.ID)"
                             @click="handleDeleteAdmin(row)"
                         >删除</el-button>
                     </template>
@@ -394,15 +421,6 @@ onMounted(() => {
                         :disabled="addFormLoading"
                     />
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input
-                        v-model="addForm.password"
-                        type="password"
-                        placeholder="请输入密码"
-                        show-password
-                        :disabled="addFormLoading"
-                    />
-                </el-form-item>
                 <el-form-item label="权限" prop="permission">
                     <el-select
                         v-model="addForm.permission"
@@ -414,6 +432,12 @@ onMounted(() => {
                         <el-option label="超级管理员" value="超级管理员" />
                     </el-select>
                 </el-form-item>
+                <el-alert
+                    title="提示：系统将自动生成初始密码，新增成功后会显示"
+                    type="info"
+                    :closable="false"
+                    show-icon
+                />
             </el-form>
 
             <template #footer>
@@ -480,7 +504,6 @@ onMounted(() => {
                         type="primary" 
                         @click="handleResetPassword" 
                         size="large"
-                        :disabled="!isSuperAdmin || (detailAdmin && isSelf(detailAdmin.ID))"
                     >重置密码</el-button>
                 </div>
             </template>
@@ -581,13 +604,6 @@ onMounted(() => {
     display: flex;
     gap: 12px;
     align-items: center;
-}
-
-.admin-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
 }
 
 .admin-avatar {
@@ -703,5 +719,33 @@ onMounted(() => {
 :deep(.el-dialog__footer) {
     border-top: 1px solid #ebeef5;
     padding: 16px 24px;
+}
+
+// 自定义简洁消息框样式
+:deep(.custom-simple-box) {
+    width: 400px;
+    border-radius: 8px;
+    
+    .el-message-box__header {
+        padding: 0;
+    }
+    
+    .el-message-box__content {
+        padding: 25px;
+    }
+    
+    .el-message-box__message {
+        margin: 0;
+    }
+    
+    .el-message-box__btns {
+        padding: 0 25px 25px;
+        text-align: right;
+        
+        button {
+            padding: 10px 25px;
+            font-size: 14px;
+        }
+    }
 }
 </style>

@@ -514,6 +514,25 @@ onMounted(() => {
   }
 }
 
+.action-btn-like {
+  background: #f1f3f5;
+  color: #868e96;
+  
+  &:hover {
+    background: #e9ecef;
+    color: #495057;
+  }
+  
+  &.active {
+    background: #ffec99;
+    color: #f08c00;
+    
+    .icon {
+      transform: scale(1.2);
+    }
+  }
+}
+
 .action-btn-bad {
   background: #f1f3f5;
   color: #868e96;
@@ -526,25 +545,6 @@ onMounted(() => {
   &.active {
     background: #ffe3e3;
     color: #e03131;
-    
-    .icon {
-      transform: scale(1.2);
-    }
-  }
-}
-
-.action-btn-like {
-  background: #fff4e6;
-  color: #ff922b;
-  
-  &:hover {
-    background: #ffe8cc;
-    color: #fd7e14;
-  }
-  
-  &.active {
-    background: #ffec99;
-    color: #f08c00;
     
     .icon {
       transform: scale(1.2);
