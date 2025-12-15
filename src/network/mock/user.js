@@ -3,12 +3,18 @@
 
 //将url查询参数转为JS对象
 function parseURLParams(url) {
-  const searchParams = new URL(url).searchParams;
-  const params = {};
-  for (const [key, value] of searchParams.entries()) {
-    params[key] = value;
+  try {
+    const urlObj = new URL(url, 'http://localhost');
+    const searchParams = urlObj.searchParams;
+    const params = {};
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+    return params;
+  } catch (e) {
+    console.error('URL解析失败:', e);
+    return {};
   }
-  return params;
 }
 
 

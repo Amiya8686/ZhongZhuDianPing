@@ -12,6 +12,7 @@ import requestConfig from "@/config/requestConfig.js";
 //后台管理mock引入
 import admin from "@/network/mock/background/admin"
 import userManage from "@/network/mock/background/userManage"
+import adminManage from "@/network/mock/background/adminManage"
 if(requestConfig.isMock){
     //客户端mock
     Mock.mock(/\/api\/user\/login/,"post",options=>{return user.login(options)});
@@ -37,7 +38,11 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/user\/getUserList/,"get",options=>{return userManage.getUserList(options)});
     Mock.mock(/\/api\/background\/user\/freezeAccount/,"post",options=>{return userManage.freezeAccount(options)});
     Mock.mock(/\/api\/background\/user\/defrostAccount/,"post",options=>{return userManage.defrostAccount(options)});
+<<<<<<< HEAD
     Mock.mock(/\/api\/background\/user\/retSetPassword/,"post",options=>{return userManage.resetPassword(options)});
+=======
+    Mock.mock(/\/api\/background\/user\/resetPassword/,"post",options=>{return userManage.resetPassword(options)});
+>>>>>>> origin/develop1.1_user
     Mock.mock(/\/api\/background\/food\/getStallList/,"get",options=>{return stallManage.getStallList(options)});
     Mock.mock(/\/api\/background\/food\/addStall/,"post",options=>{return stallManage.addStall(options)});
     Mock.mock(/\/api\/background\/food\/editStallInfo/,"post",options=>{return stallManage.editStallInfo(options)});
@@ -46,12 +51,8 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/dish\/addDish/,"post",options=>{return stallManage.addDish(options)});
     Mock.mock(/\/api\/background\/dish\/editDishInfo/,"post",options=>{return stallManage.editDishInfo(options)});
     Mock.mock(/\/api\/background\/dish\/deleteDish/,"post",options=>{return stallManage.deleteDish(options)});
+    Mock.mock(/\/api\/background\/adminManage\/getAdminList/,"get",options=>{return adminManage.getAdminList(options)});
+    Mock.mock(/\/api\/background\/adminManage\/addAdmin/,"post",options=>{return adminManage.addAdmin(options)});
+    Mock.mock(/\/api\/background\/adminManage\/deleteAdmin/,"post",options=>{return adminManage.deleteAdmin(options)});
+    Mock.mock(/\/api\/background\/adminManage\/resetPassword/,"post",options=>{return adminManage.resetAdminPassword(options)});
 }
-
-
-
-
-
-
-
-

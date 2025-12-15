@@ -5,12 +5,19 @@ import { commentDataBase } from './comment.js'
 
 //将url查询参数转为JS对象
 function parseURLParams(url) {
-  const searchParams = new URL(url).searchParams;
-  const params = {};
-  for (const [key, value] of searchParams.entries()) {
-    params[key] = value;
+  try {
+    // 兼容相对路径和绝对路径
+    const urlObj = new URL(url, 'http://localhost');
+    const searchParams = urlObj.searchParams;
+    const params = {};
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+    return params;
+  } catch (e) {
+    console.error('URL解析失败:', e);
+    return {};
   }
-  return params;
 }
 
 //模拟档口数据库
@@ -307,28 +314,22 @@ const getStallInfo = (config)=>{
         }
     ]
     
-    // 从commentDataBase中查询该档口的评论，按点赞数排序，取前2条作为热门评论
-    const stallComments = commentDataBase
-        .filter(comment => comment.stallID === stallID)
-        .sort((a, b) => b.like - a.like)
-        .slice(0, 2)
-    
-    // 将评论数据转换为API文档要求的格式
-    const commentList = stallComments.map(comment => {
-        return {
-            ID: comment.ID,
-            reviewerName: comment.userId, // 使用userId作为reviewerName
-            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg', // 默认头像
-            dateTime: comment.dateTime,
-            rating: comment.rating,
-            like: comment.like,
-            evaluation: comment.evaluation || 'none',
-            content: comment.content,
-            picture1Url: comment.picture1Url || '',
-            picture2Url: comment.picture2Url || '',
-            picture3Url: comment.picture3Url || ''
+    //模拟热门评论列表
+    const commentList = [
+        {
+            ID: 1,
+            reviewerName: 'NiNa',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-15 12:30:45',
+            rating: 5.0,
+            like: 23,
+            evaluation: 'none',
+            content: '非常好吃，强烈推荐！',
+            pictrue1Url: '',
+            picture2Url: '',
+            picture3Url: ''
         }
-    })
+    ]
     
     return {
         code:200,
@@ -347,12 +348,40 @@ const getStallInfo = (config)=>{
     }
 }
 
-//获取档口菜品列表
+//模拟菜品数据库（用于记录用户评价状态）
+let dishDatabase = {}
+
+//初始化菜品数据库
+const initDishDatabase = () => {
+    const dishes = [
+        { ID: 1, name: '烧鸭饭', price: 25, like: 128, bad: 5, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
+        { ID: 2, name: '烧肉饭', price: 23, like: 95, bad: 8, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+        { ID: 3, name: '烧鹅饭', price: 28, like: 156, bad: 3, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
+        { ID: 4, name: '叉烧饭', price: 22, like: 88, bad: 6, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+        { ID: 5, name: '白切鸡饭', price: 24, like: 102, bad: 4, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
+        { ID: 6, name: '双拼饭', price: 26, like: 145, bad: 7, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+        { ID: 7, name: '三拼饭', price: 30, like: 178, bad: 2, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
+        { ID: 8, name: '烧腊拼盘', price: 35, like: 203, bad: 1, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+        { ID: 9, name: '油鸡饭', price: 23, like: 76, bad: 9, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
+        { ID: 10, name: '卤水拼盘', price: 32, like: 134, bad: 5, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+        { ID: 11, name: '咸鱼鸡粒炒饭', price: 20, like: 67, bad: 12, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
+        { ID: 12, name: '腊味煲仔饭', price: 28, like: 189, bad: 4, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+    ]
+    
+    dishes.forEach(dish => {
+        dishDatabase[dish.ID] = { ...dish, evaluation: 'none' }
+    })
+}
+
+//初始化
+initDishDatabase()
+
+//获取档口的全部菜品列表
 //输入: config对象，查询参数包含{stallID}
 //输出: 响应对象
-//成功: {code: 200, data: Array}
+//成功: {code: 200, data: {dishList: Array}}
 //失败: {code: 998, msg: "token unvalid"}
-const getStallDishList = (config)=>{
+const getStallDishList = (config) => {
     const userName = checkToken(config)
     
     if(!userName){
@@ -363,107 +392,370 @@ const getStallDishList = (config)=>{
     }
     
     const search = parseURLParams(config.url)
-    const stallID = parseInt(search.stallID)
+    const stallID = search.stallID
     
-    const stall = stallDataBase.find(item => item.ID === stallID)
+    console.log(`[getStallDishList] 获取档口${stallID}的菜品列表`)
     
-    if(!stall){
-        return {
-            code:200,
-            data:[]
-        }
-    }
-
-    // 针对 ID=3 (快乐汉堡) 返回特定的测试数据
-    if (stallID === 3) {
-        console.log('[getStallDishList] 返回档口3的特殊测试数据')
-        return {
-            code: 200,
-            data: [
-                {
-                    id: 301,
-                    name: '双层芝士牛肉堡',
-                    price: 22.0,
-                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-                    recommendCount: 156
-                },
-                {
-                    id: 302,
-                    name: '香辣鸡腿堡',
-                    price: 18.0,
-                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-                    recommendCount: 120
-                },
-                {
-                    id: 303,
-                    name: '大薯条',
-                    price: 12.0,
-                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-                    recommendCount: 89
-                },
-                {
-                    id: 304,
-                    name: '冰可乐',
-                    price: 6.0,
-                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-                    recommendCount: 200
-                },
-                {
-                    id: 305,
-                    name: '麦乐鸡块(5块)',
-                    price: 14.0,
-                    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-                    recommendCount: 65
-                }
-            ]
-        }
-    }
-    
-    //模拟菜品数据
-    const dishes = [
-        {
-            id: stallID * 100 + 1,
-            name: stall.signatureDish,
-            price: stall.meanPrice,
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            recommendCount: 100 + Math.floor(Math.random() * 50)
-        },
-        {
-            id: stallID * 100 + 2,
-            name: '招牌套餐A',
-            price: stall.meanPrice + 5,
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-            recommendCount: 80 + Math.floor(Math.random() * 20)
-        },
-        {
-            id: stallID * 100 + 3,
-            name: '超值单人餐',
-            price: stall.meanPrice - 2,
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            recommendCount: 60 + Math.floor(Math.random() * 30)
-        },
-        {
-            id: stallID * 100 + 4,
-            name: '特色小吃',
-            price: 8,
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
-            recommendCount: 40 + Math.floor(Math.random() * 10)
-        },
-        {
-            id: stallID * 100 + 5,
-            name: '清爽饮料',
-            price: 5,
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
-            recommendCount: 20 + Math.floor(Math.random() * 5)
-        }
-    ]
-    
-    console.log(`[getStallDishList] 档口${stallID}的菜品列表，共${dishes.length}个`)
+    //返回所有菜品（实际应该根据stallID筛选）
+    const dishList = Object.values(dishDatabase)
     
     return {
-        code:200,
-        data: dishes
+        code: 200,
+        data: {
+            dishList: dishList,
+            token: userName
+        }
     }
 }
 
-export default {getStallList, getStallInfo, getStallDishList}
+//更新菜品的评价状态
+//输入: config对象，body包含{dishID, newEvaluation}
+//输出: 响应对象
+//成功: {code: 200}
+//失败: {code: 998, msg: "token unvalid"}
+const evaluateDish = (config) => {
+    //从params获取token（mock环境）
+    const search = parseURLParams(config.url)
+    const token = search.token
+    
+    if(!token){
+        return {
+            code: 998,
+            msg: "token unvalid"
+        }
+    }
+    
+    const userName = token
+    const body = JSON.parse(config.body)
+    const dishID = body.dishID
+    const newEvaluation = body.newEvaluation
+    
+    console.log(`[evaluateDish] 用户${userName}对菜品${dishID}评价为${newEvaluation}`)
+    
+    //更新菜品评价状态和计数
+    if(dishDatabase[dishID]){
+        const dish = dishDatabase[dishID]
+        const oldEvaluation = dish.evaluation
+        
+        // 更新计数
+        // 先移除旧评价的影响
+        if (oldEvaluation === 'like') {
+            dish.like = Math.max(0, dish.like - 1)
+        } else if (oldEvaluation === 'bad') {
+            dish.bad = Math.max(0, dish.bad - 1)
+        }
+        
+        // 添加新评价的影响
+        if (newEvaluation === 'like') {
+            dish.like++
+        } else if (newEvaluation === 'bad') {
+            dish.bad++
+        }
+        
+        // 更新状态
+        dish.evaluation = newEvaluation
+    }
+    
+    return {
+        code: 200,
+        data: {
+            token: userName
+        }
+    }
+}
+
+//模拟评论数据库
+let commentDatabase = {}
+
+//初始化评论数据库
+const initCommentDatabase = () => {
+    const comments = [
+        {
+            ID: 1,
+            reviewerName: 'NiNa',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-27 12:30:45',
+            rating: 5.0,
+            like: 128,
+            evaluation: 'none',
+            content: '非常好吃，强烈推荐！服务态度也很好，环境干净整洁，下次还会再来的。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: 2,
+            reviewerName: '小明',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-26 18:45:20',
+            rating: 4.5,
+            like: 89,
+            evaluation: 'none',
+            content: '味道不错，份量足够，性价比很高。就是人有点多，需要排队。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture2Url: '',
+            picture3Url: ''
+        },
+        {
+            ID: 3,
+            reviewerName: '美食家小王',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-25 13:15:30',
+            rating: 4.8,
+            like: 156,
+            evaluation: 'none',
+            content: '这家的招牌菜真的很赞！每次来都要点，从来没有失望过。老板人也很好，经常有优惠活动。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture3Url: ''
+        },
+        {
+            ID: 4,
+            reviewerName: '吃货大叔',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-24 19:20:15',
+            rating: 4.2,
+            like: 67,
+            evaluation: 'none',
+            content: '整体还可以，但是有些菜品略咸，建议可以改进一下。不过其他方面都挺满意的。',
+            pictrue1Url: '',
+            picture2Url: '',
+            picture3Url: ''
+        },
+        {
+            ID: 5,
+            reviewerName: '李小姐',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-23 12:00:00',
+            rating: 5.0,
+            like: 203,
+            evaluation: 'none',
+            content: '超级好吃！特别是他们家的酱料，太有特色了！环境也很温馨，适合和朋友一起来聚餐。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+        },
+        {
+            ID: 6,
+            reviewerName: '张三',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-22 14:30:25',
+            rating: 4.6,
+            like: 98,
+            evaluation: 'none',
+            content: '价格实惠，味道也不错，是学生党的好选择。推荐给大家！',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture2Url: '',
+            picture3Url: ''
+        },
+        {
+            ID: 7,
+            reviewerName: '美食探索者',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-21 11:45:50',
+            rating: 4.9,
+            like: 187,
+            evaluation: 'none',
+            content: '惊艳！没想到食堂也能做出这么好吃的菜。食材新鲜，烹饪技术也很专业。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture3Url: ''
+        },
+        {
+            ID: 8,
+            reviewerName: '王大锤',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-20 17:30:10',
+            rating: 4.3,
+            like: 76,
+            evaluation: 'none',
+            content: '还行吧，偶尔来吃一次挺好的。不过高峰期要早点来，不然没位置。',
+            pictrue1Url: '',
+            picture2Url: '',
+            picture3Url: ''
+        },
+        {
+            ID: 9,
+            reviewerName: '小红',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-19 13:20:35',
+            rating: 4.7,
+            like: 134,
+            evaluation: 'none',
+            content: '很喜欢这里的氛围，菜品也很合我口味。而且老板很热情，每次都会推荐新菜品。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+        },
+        {
+            ID: 10,
+            reviewerName: '刘同学',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-18 12:15:20',
+            rating: 4.4,
+            like: 92,
+            evaluation: 'none',
+            content: '性价比高，味道也可以。就是希望能多一些菜品选择就更好了。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture2Url: '',
+            picture3Url: ''
+        },
+        {
+            ID: 11,
+            reviewerName: '美味猎人',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-11-17 18:50:45',
+            rating: 4.8,
+            like: 165,
+            evaluation: 'none',
+            content: '真的很不错！尤其是他们的特色菜，必点！强烈安利给大家。',
+            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture3Url: ''
+        },
+        {
+            ID: 12,
+            reviewerName: '陈先生',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            dateTime: '2025-11-16 11:30:15',
+            rating: 4.1,
+            like: 58,
+            evaluation: 'none',
+            content: '中规中矩吧，没有特别惊艳，但也不难吃。价格合理，偶尔换换口味可以来。',
+            pictrue1Url: '',
+            picture2Url: '',
+            picture3Url: ''
+        }
+    ]
+    
+    comments.forEach(comment => {
+        commentDatabase[comment.ID] = { ...comment }
+    })
+}
+
+//初始化
+initCommentDatabase()
+
+//获取档口的全部评论列表
+//输入: config对象，查询参数包含{stallID, numPerPage, pageIndex}
+//输出: 响应对象
+//成功: {code: 200, data: {commentList: Array, totalPageNum: number, pageIndex: number}}
+//失败: {code: 998, msg: "token unvalid"}
+const getStallCommentList = (config) => {
+    console.log('[Mock] getStallCommentList request:', config.url);
+    const userName = checkToken(config)
+    
+    if(!userName){
+        return {
+            code: 998,
+            msg: "token unvalid"
+        }
+    }
+    
+    const search = parseURLParams(config.url)
+    const stallID = search.stallID
+    const numPerPage = parseInt(search.numPerPage) || 10
+    const pageIndex = parseInt(search.pageIndex) || 1
+    
+    console.log(`[getStallCommentList] 获取档口${stallID}的评论列表，第${pageIndex}页，每页${numPerPage}条`)
+    
+    // 确保 commentDatabase 有数据，如果没有则重新初始化
+    if (Object.keys(commentDatabase).length === 0) {
+        console.warn('[getStallCommentList] commentDatabase 为空，重新初始化')
+        initCommentDatabase()
+    }
+    
+    //返回所有评论（实际应该根据stallID筛选）
+    const allComments = Object.values(commentDatabase)
+    
+    // 如果还是空，强制添加一些测试数据
+    if (allComments.length === 0) {
+        console.warn('[getStallCommentList] 依然为空，使用强制数据')
+        allComments.push({
+            ID: 999,
+            reviewerName: '测试用户',
+            avatarUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            dateTime: '2025-12-12 12:00:00',
+            rating: 5.0,
+            like: 10,
+            evaluation: 'none',
+            content: '这是一条强制显示的测试评论，如果你看到这条消息，说明Mock数据初始化有问题。',
+            pictrue1Url: '',
+            picture2Url: '',
+            picture3Url: ''
+        })
+    }
+    
+    //计算分页
+    const total = allComments.length
+    const totalPageNum = Math.ceil(total / numPerPage)
+    const startIndex = (pageIndex - 1) * numPerPage
+    const endIndex = startIndex + numPerPage
+    const commentList = allComments.slice(startIndex, endIndex)
+    
+    console.log(`[getStallCommentList] 返回 ${commentList.length} 条评论`)
+    
+    return {
+        code: 200,
+        data: {
+            commentList: commentList,
+            totalPageNum: totalPageNum,
+            pageIndex: pageIndex,
+            token: userName
+        }
+    }
+}
+
+//对评论进行评价（点赞）
+//输入: config对象，body包含{commentID, newEvaluation}
+//输出: 响应对象
+//成功: {code: 200}
+//失败: {code: 998, msg: "token unvalid"}
+const evaluationComment = (config) => {
+    //从params获取token（mock环境）
+    const search = parseURLParams(config.url)
+    const token = search.token
+    
+    if(!token){
+        return {
+            code: 998,
+            msg: "token unvalid"
+        }
+    }
+    
+    const userName = token
+    const body = JSON.parse(config.body)
+    const commentID = body.commentID
+    const newEvaluation = body.newEvaluation
+    
+    console.log(`[evaluationComment] 用户${userName}对评论${commentID}评价为${newEvaluation}`)
+    
+    //更新评论评价状态和计数
+    if(commentDatabase[commentID]){
+        const comment = commentDatabase[commentID]
+        const oldEvaluation = comment.evaluation
+        
+        // 更新计数
+        // 先移除旧评价的影响
+        if (oldEvaluation === 'like') {
+            comment.like = Math.max(0, comment.like - 1)
+        }
+        
+        // 添加新评价的影响
+        if (newEvaluation === 'like') {
+            comment.like++
+        }
+        
+        // 更新状态
+        comment.evaluation = newEvaluation
+    }
+    
+    return {
+        code: 200,
+        data: {
+            token: userName
+        }
+    }
+}
+
+export default {getStallList, getStallInfo, getStallDishList, evaluateDish, getStallCommentList, evaluationComment}
