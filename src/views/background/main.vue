@@ -74,6 +74,7 @@ onMounted(()=>{
     padding: 0;
     flex: 1;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* 验证等待样式 */
