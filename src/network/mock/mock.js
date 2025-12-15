@@ -38,11 +38,7 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/background\/user\/getUserList/,"get",options=>{return userManage.getUserList(options)});
     Mock.mock(/\/api\/background\/user\/freezeAccount/,"post",options=>{return userManage.freezeAccount(options)});
     Mock.mock(/\/api\/background\/user\/defrostAccount/,"post",options=>{return userManage.defrostAccount(options)});
-<<<<<<< HEAD
-    Mock.mock(/\/api\/background\/user\/retSetPassword/,"post",options=>{return userManage.resetPassword(options)});
-=======
     Mock.mock(/\/api\/background\/user\/resetPassword/,"post",options=>{return userManage.resetPassword(options)});
->>>>>>> origin/develop1.1_user
     Mock.mock(/\/api\/background\/food\/getStallList/,"get",options=>{return stallManage.getStallList(options)});
     Mock.mock(/\/api\/background\/food\/addStall/,"post",options=>{return stallManage.addStall(options)});
     Mock.mock(/\/api\/background\/food\/editStallInfo/,"post",options=>{return stallManage.editStallInfo(options)});
