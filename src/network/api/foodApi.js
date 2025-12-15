@@ -62,9 +62,7 @@ const createStallComment = (commentData)=>{
         url:"/food/createStallComment",
         method:"post",
         data:commentData,
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
+        contentType:"multipart/form-data"
     }
     return request(option)
 }
