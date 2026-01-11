@@ -236,7 +236,7 @@ const dishForm = reactive({
 })
 const dishFormRules = reactive({
   name : [
-    { required: true, message: "请输入旧密码", trigger: ["blur"] },
+    { required: true, message: "请输入菜品名", trigger: ["blur"] },
     { max: 15, message: "菜品名不能超过15字", trigger: ["blur"] }
   ],
   price: [
