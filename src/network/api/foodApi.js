@@ -114,6 +114,23 @@ const evaluateDish = (params)=>{
     return request(option)
 }
 
+
+
+//获取推荐档口列表
+//输入: 无
+//输出: promise对象
+//成功: resolve({recommendedStallList: Array})
+//失败: reject(errorMessage)
+const getRecommendedStall = ()=>{
+    const option = {
+        baseURL: requestConfig.isMock?requestConfig.mockURL:requestConfig.baseURL,
+        url:"/home/getRecommendedStall",
+        method:"get",
+    }
+    return request(option)
+}
+
+
 export default {
     getStallList,
     getStallInfo,
@@ -121,5 +138,6 @@ export default {
     createStallComment,
     evaluationComment,
     getStallDishList,
-    evaluateDish
+    evaluateDish,
+    getRecommendedStall,
 }
