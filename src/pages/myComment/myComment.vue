@@ -89,7 +89,11 @@ const getStars = (rating) => {
 const isShowPage = ref(false);
 const tokenVerify = async ()=>{
   try{
+<<<<<<< HEAD
     await proxy.$tokenApi.checkToken();
+=======
+    await proxy.$tokenApi.chechToken();
+>>>>>>> origin/develop1.1_user
     isShowPage.value = true;
   }catch(error){
     console.log(error);
