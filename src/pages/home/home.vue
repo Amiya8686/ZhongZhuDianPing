@@ -1,5 +1,5 @@
 <script setup>
-import {reactive, getCurrentInstance, onMounted, ref} from "vue"
+import {reactive, getCurrentInstance, onMounted, ref, computed} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
 import { ArrowDown } from '@element-plus/icons-vue' // <-- 添加这一行
 const {proxy} = getCurrentInstance()
@@ -13,6 +13,28 @@ const userInfo = reactive({
 
 //是否已登录
 const isLoggedIn = ref(false)
+
+//推荐档口列表
+const recommendedStallList = ref([])
+
+//计算属性：将推荐列表分组，每组3个
+const recommendedGroups = computed(() => {
+  const groups = []
+  for (let i = 0; i < recommendedStallList.value.length; i += 3) {
+    groups.push(recommendedStallList.value.slice(i, i + 3))
+  }
+  return groups
+})
+
+//获取推荐档口
+const getRecommendedStalls = async () => {
+  try {
+    const res = await proxy.$foodApi.getRecommendedStall()
+    recommendedStallList.value = res.recommendedStallList || []
+  } catch (error) {
+    console.error('获取推荐档口失败:', error)
+  }
+}
 
 //获取用户信息
 const getUserInfo = async () => {
@@ -114,6 +136,7 @@ const handleCommand = (command) => {
 
 onMounted(() => {
   getUserInfo();
+  getRecommendedStalls();
 })
 
 </script>
@@ -162,102 +185,30 @@ onMounted(() => {
       <section class="recommendSection">
         <div class="container">
           <h2 class="sectionTitle">🔥 热门推荐</h2>
-          <el-carousel height="280px" :interval="4000" arrow="always" indicator-position="outside">
-            <!-- 横幅1：3个店铺 -->
-            <el-carousel-item>
+          <el-carousel height="320px" :interval="4000" arrow="always" indicator-position="outside">
+            <el-carousel-item v-for="(group, groupIndex) in recommendedGroups" :key="groupIndex">
               <div class="stallCarouselItem">
-                <el-card class="stallCard" shadow="hover">
-                  <div class="stallImage">
-                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg" alt="店铺图片">
-                    <div class="stallTag">烧腊</div>
+                <el-card 
+                  v-for="stall in group" 
+                  :key="stall.ID" 
+                  class="stallCard" 
+                  shadow="hover"
+                  @click="() => window.location.href = `/foodReview/stall?stallID=${stall.ID}`"
+                >
+                  <!-- 菜品图片区域（类别标签在图片内部右上角） -->
+                  <div class="dishImage">
+                    <img :src="stall.dishPictureUrl" :alt="stall.signatureDish">
+                    <span class="typeTag">{{ stall.type }}</span>
                   </div>
-                  <div class="stallInfo">
-                    <h3 class="stallName">美味烧腊</h3>
-                    <div class="stallMeta">
-                      <span class="rating">⭐ 4.8</span>
-                      <span class="price">¥25/人</span>
+                  
+                  <!-- 图片下方区域：菜品信息 -->
+                  <div class="dishInfo">
+                    <h3 class="dishName">{{ stall.signatureDish }}</h3>
+                    <div class="dishMeta">
+                      <span class="rating">⭐ {{ stall.rating }}</span>
+                      <span class="price">¥{{ stall.dishPrice }}</span>
                     </div>
-                    <p class="stallDesc">招牌烧鸭，酱汁浓郁，肉质鲜嫩</p>
-                  </div>
-                </el-card>
-                
-                <el-card class="stallCard" shadow="hover">
-                  <div class="stallImage">
-                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg" alt="店铺图片">
-                    <div class="stallTag">麻辣烫</div>
-                  </div>
-                  <div class="stallInfo">
-                    <h3 class="stallName">老坛麻辣烫</h3>
-                    <div class="stallMeta">
-                      <span class="rating">⭐ 4.6</span>
-                      <span class="price">¥18/人</span>
-                    </div>
-                    <p class="stallDesc">选料丰富，汤底香浓，辣度可调</p>
-                  </div>
-                </el-card>
-                
-                <el-card class="stallCard" shadow="hover">
-                  <div class="stallImage">
-                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg" alt="店铺图片">
-                    <div class="stallTag">汉堡</div>
-                  </div>
-                  <div class="stallInfo">
-                    <h3 class="stallName">快乐汉堡</h3>
-                    <div class="stallMeta">
-                      <span class="rating">⭐ 4.9</span>
-                      <span class="price">¥22/人</span>
-                    </div>
-                    <p class="stallDesc">新鲜牛肉饼，芝士浓郁，超大份</p>
-                  </div>
-                </el-card>
-              </div>
-            </el-carousel-item>
-            
-            <!-- 横幅2：3个店铺 -->
-            <el-carousel-item>
-              <div class="stallCarouselItem">
-                <el-card class="stallCard" shadow="hover">
-                  <div class="stallImage">
-                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg" alt="店铺图片">
-                    <div class="stallTag">面食</div>
-                  </div>
-                  <div class="stallInfo">
-                    <h3 class="stallName">手工拉面</h3>
-                    <div class="stallMeta">
-                      <span class="rating">⭐ 4.7</span>
-                      <span class="price">¥15/人</span>
-                    </div>
-                    <p class="stallDesc">现拉现煮，劲道十足，汤头鲜美</p>
-                  </div>
-                </el-card>
-                
-                <el-card class="stallCard" shadow="hover">
-                  <div class="stallImage">
-                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg" alt="店铺图片">
-                    <div class="stallTag">盖浇饭</div>
-                  </div>
-                  <div class="stallInfo">
-                    <h3 class="stallName">黄焖鸡米饭</h3>
-                    <div class="stallMeta">
-                      <span class="rating">⭐ 4.5</span>
-                      <span class="price">¥20/人</span>
-                    </div>
-                    <p class="stallDesc">鸡肉嫩滑，酱汁入味，配菜丰富</p>
-                  </div>
-                </el-card>
-                
-                <el-card class="stallCard" shadow="hover">
-                  <div class="stallImage">
-                    <img src="/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg" alt="店铺图片">
-                    <div class="stallTag">饮品</div>
-                  </div>
-                  <div class="stallInfo">
-                    <h3 class="stallName">鲜榨果汁</h3>
-                    <div class="stallMeta">
-                      <span class="rating">⭐ 4.8</span>
-                      <span class="price">¥12/杯</span>
-                    </div>
-                    <p class="stallDesc">新鲜水果现榨，无添加，健康美味</p>
+                    <p class="stallName">{{ stall.name }}</p>
                   </div>
                 </el-card>
               </div>
@@ -421,14 +372,15 @@ onMounted(() => {
         
         &:hover{
           transform: translateY(-5px);
-          filter: brightness(1.1);
+          filter: brightness(1.05);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
         
-        .stallImage{
+        // 菜品图片区域（类别标签在图片内部右上角）
+        .dishImage{
           position: relative;
           width: 100%;
-          height: 140px;
+          height: 160px;
           overflow: hidden;
           
           img{
@@ -438,7 +390,7 @@ onMounted(() => {
             transition: transform 0.3s ease;
           }
           
-          .stallTag{
+          .typeTag{
             position: absolute;
             top: 10px;
             right: 10px;
@@ -448,17 +400,19 @@ onMounted(() => {
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
+            z-index: 1;
           }
         }
         
-        &:hover .stallImage img{
+        &:hover .dishImage img{
           transform: scale(1.1);
         }
         
-        .stallInfo{
+        // 菜品信息区域
+        .dishInfo{
           padding: 15px;
           
-          .stallName{
+          .dishName{
             font-size: 18px;
             font-weight: 600;
             margin: 0 0 8px 0;
@@ -468,7 +422,7 @@ onMounted(() => {
             white-space: nowrap;
           }
           
-          .stallMeta{
+          .dishMeta{
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
@@ -485,17 +439,11 @@ onMounted(() => {
             }
           }
           
-          .stallDesc{
+          .stallName{
             font-size: 13px;
             color: #666;
+            margin: 8px 0 0 0;
             line-height: 1.4;
-            margin: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
           }
         }
       }

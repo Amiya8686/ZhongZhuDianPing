@@ -758,4 +758,33 @@ const evaluationComment = (config) => {
     }
 }
 
-export default {getStallList, getStallInfo, getStallDishList, evaluateDish, getStallCommentList, evaluationComment}
+
+//获取推荐档口列表（用于home页面）
+//输入: 无
+//输出: 响应对象
+//成功: {code: 200, data: {recommendedStallList: Array}}
+const getRecommendedStall = ()=>{
+    // 按评分排序，取前6个档口作为推荐
+    const recommendedStalls = [...stallDataBase]
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 6)
+        .map(stall => ({
+            ID: stall.ID,
+            name: stall.name,
+            type: stall.type,
+            rating: stall.rating,
+            signatureDish: stall.signatureDish,
+            dishPrice: stall.meanPrice,
+            dishPictureUrl: stall.pictureUrl
+        }))
+    
+    console.log(`[getRecommendedStall] 返回${recommendedStalls.length}个推荐档口`)    
+    return {
+        code: 200,
+        data: {
+            recommendedStallList: recommendedStalls
+        }
+    }
+}
+
+export default {getStallList, getStallInfo, getStallDishList, evaluateDish, getStallCommentList, evaluationComment,getRecommendedStall}
