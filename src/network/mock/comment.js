@@ -15,6 +15,7 @@ const commentDataBase = [
   {
     ID: 1,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 1,
     stallName: '美味烧腊',
     canteen: '榕园食堂',
@@ -30,6 +31,7 @@ const commentDataBase = [
   {
     ID: 2,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 2,
     stallName: '老坛麻辣烫',
     canteen: '榕园食堂',
@@ -45,6 +47,7 @@ const commentDataBase = [
   {
     ID: 3,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 3,
     stallName: '快乐汉堡',
     canteen: '榕园食堂',
@@ -61,6 +64,7 @@ const commentDataBase = [
   {
     ID: 301,
     userId: 'BurgerKing',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 3,
     stallName: '快乐汉堡',
     canteen: '槿园食堂',
@@ -76,6 +80,7 @@ const commentDataBase = [
   {
     ID: 302,
     userId: 'Foodie_John',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 3,
     stallName: '快乐汉堡',
     canteen: '槿园食堂',
@@ -91,6 +96,7 @@ const commentDataBase = [
   {
     ID: 303,
     userId: 'Alice_Wonder',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 3,
     stallName: '快乐汉堡',
     canteen: '槿园食堂',
@@ -106,6 +112,7 @@ const commentDataBase = [
   {
     ID: 4,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 4,
     stallName: '手工拉面',
     canteen: '槿园食堂',
@@ -121,6 +128,7 @@ const commentDataBase = [
   {
     ID: 5,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 5,
     stallName: '黄焖鸡米饭',
     canteen: '槿园食堂',
@@ -136,6 +144,7 @@ const commentDataBase = [
   {
     ID: 6,
     userId: 'AWa_SuBaRu',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 1,
     stallName: '美味烧腊',
     canteen: '荔园食堂',
@@ -151,6 +160,7 @@ const commentDataBase = [
   {
     ID: 7,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 6,
     stallName: '鲜榨果汁',
     canteen: '荔园食堂',
@@ -166,6 +176,7 @@ const commentDataBase = [
   {
     ID: 8,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 2,
     stallName: '老坛麻辣烫',
     canteen: '荔园食堂',
@@ -181,6 +192,7 @@ const commentDataBase = [
   {
     ID: 9,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 4,
     stallName: '手工拉面',
     canteen: '槿园食堂',
@@ -196,6 +208,7 @@ const commentDataBase = [
   {
     ID: 10,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 5,
     stallName: '黄焖鸡米饭',
     canteen: '槿园食堂',
@@ -211,6 +224,7 @@ const commentDataBase = [
   {
     ID: 11,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 3,
     stallName: '快乐汉堡',
     canteen: '槿园食堂',
@@ -226,6 +240,7 @@ const commentDataBase = [
   {
     ID: 12,
     userId: 'ISeRi_NiNa',
+    avatarUrl:'/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
     stallID: 6,
     stallName: '鲜榨果汁',
     canteen: '荔园食堂',
@@ -352,7 +367,6 @@ const deleteComment = (config)=>{
 //失败: {code: 998, msg: "token unvalid"}
 const getStallCommentList = (config)=>{
     const userName = checkToken(config)
-    
     if(!userName){
         return {
             code:998,
@@ -381,13 +395,12 @@ const getStallCommentList = (config)=>{
             evaluation: comment.evaluation || 'none'
         }
     })
-    
     console.log(`[getStallCommentList] 档口${stallID}的评论，总数${totalComments}条，第${pageIndex}页，共${totalPageNum}页`)
     
     return {
         code:200,
         data:{
-            comments: comments,
+            commentList: comments,
             totalPageNum: totalPageNum,
             pageIndex: pageIndex
         }
