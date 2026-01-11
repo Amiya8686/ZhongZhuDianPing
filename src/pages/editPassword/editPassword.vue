@@ -93,14 +93,25 @@ const submitForm = async ()=>{
     })
 }
 
+//验证token
+const isShowPage = ref(false);
+const tokenVerify = async ()=>{
+  try{
+    await proxy.$tokenApi.chechToken();
+    isShowPage.value = true;
+  }catch(error){
+    console.log(error);
+  }
+}
 onMounted(()=>{
+  tokenVerify();
   loadUserInfo();
 })
 
 </script>
 
 <template>
-  <div class="page">
+  <div class="page" v-show="isShowPage">
     <!-- 左上角 Logo -->
     <div class="pageLogo" @click="handleClickLogo">
       <h1>中珠点评</h1>

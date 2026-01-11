@@ -85,13 +85,25 @@ const getStars = (rating) => {
   return '⭐'.repeat(rating)
 }
 
+//验证token
+const isShowPage = ref(false);
+const tokenVerify = async ()=>{
+  try{
+    await proxy.$tokenApi.chechToken();
+    isShowPage.value = true;
+  }catch(error){
+    console.log(error);
+  }
+}
+
 onMounted(() => {
+  tokenVerify();
   getMyComments()
 })
 </script>
 
 <template>
-  <div class="myCommentPage">
+  <div class="myCommentPage" v-show="isShowPage">
     <div class="pageContainer">
       <h1 class="pageTitle">我的评论</h1>
       

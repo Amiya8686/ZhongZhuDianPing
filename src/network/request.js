@@ -24,7 +24,8 @@ httpInstance.interceptors.response.use(res=>{
         const path = window.location.pathname
         const newPath = getClientPageToGo(path)
         if(path!==newPath){
-            window.location.href=newPath;
+            ElMessage.error("token验证失败，准备跳转页面")
+            setTimeout(()=>{window.location.href=newPath;},3000);
         }
         return Promise.reject("客户端token验证失败")
     }else if(code==997){
@@ -32,7 +33,8 @@ httpInstance.interceptors.response.use(res=>{
         localStorage.removeItem("token")
         const path = window.location.pathname
         const newPath = getServerPageToGo(path)
-        window.location.href=newPath
+        ElMessage.error("token验证失败，准备跳转页面")
+        setTimeout(()=>{window.location.href=newPath;},3000);
         return Promise.reject("服务端token验证失败")
     }else{
         //普通失败，不显示错误信息，由调用者决定是否提示
