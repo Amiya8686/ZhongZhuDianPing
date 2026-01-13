@@ -239,10 +239,10 @@ onMounted(() => {
           <div class="comment-images">
             <div 
               class="image-item" 
-              v-if="comment.pictrue1Url"
-              @click="handlePreviewImage(comment.pictrue1Url)"
+              v-if="comment.picture1Url"
+              @click="handlePreviewImage(comment.picture1Url)"
             >
-              <img :src="comment.pictrue1Url" alt="评论图片" />
+              <img :src="comment.picture1Url" alt="评论图片" />
             </div>
             <div 
               class="image-item" 

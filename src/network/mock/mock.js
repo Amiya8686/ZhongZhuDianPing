@@ -30,6 +30,7 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/food\/getStallCommentList/,"get",options=>{return comment.getStallCommentList(options)});
     Mock.mock(/\/api\/food\/createStallComment/,"post",options=>{return comment.createStallComment(options)});
     Mock.mock(/\/api\/food\/evaluationComment/,"post",options=>{return comment.evaluationComment(options)});
+    Mock.mock(/\/api\/home\/getRecommendedStall/,"get",options=>{return food.getRecommendedStall(options)});
     
     //后台管理mock
     Mock.mock(/\/api\/background\/checkToken/,"get",options=>{return admin.checkTokenApi(options)});
