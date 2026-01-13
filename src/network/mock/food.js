@@ -325,7 +325,7 @@ const getStallInfo = (config)=>{
             like: 23,
             evaluation: 'none',
             content: '非常好吃，强烈推荐！',
-            pictrue1Url: '',
+            picture1Url: '',
             picture2Url: '',
             picture3Url: ''
         }
@@ -479,7 +479,7 @@ const initCommentDatabase = () => {
             like: 128,
             evaluation: 'none',
             content: '非常好吃，强烈推荐！服务态度也很好，环境干净整洁，下次还会再来的。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         },
@@ -492,7 +492,7 @@ const initCommentDatabase = () => {
             like: 89,
             evaluation: 'none',
             content: '味道不错，份量足够，性价比很高。就是人有点多，需要排队。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture2Url: '',
             picture3Url: ''
         },
@@ -505,7 +505,7 @@ const initCommentDatabase = () => {
             like: 156,
             evaluation: 'none',
             content: '这家的招牌菜真的很赞！每次来都要点，从来没有失望过。老板人也很好，经常有优惠活动。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture3Url: ''
         },
@@ -518,7 +518,7 @@ const initCommentDatabase = () => {
             like: 67,
             evaluation: 'none',
             content: '整体还可以，但是有些菜品略咸，建议可以改进一下。不过其他方面都挺满意的。',
-            pictrue1Url: '',
+            picture1Url: '',
             picture2Url: '',
             picture3Url: ''
         },
@@ -531,7 +531,7 @@ const initCommentDatabase = () => {
             like: 203,
             evaluation: 'none',
             content: '超级好吃！特别是他们家的酱料，太有特色了！环境也很温馨，适合和朋友一起来聚餐。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
         },
@@ -544,7 +544,7 @@ const initCommentDatabase = () => {
             like: 98,
             evaluation: 'none',
             content: '价格实惠，味道也不错，是学生党的好选择。推荐给大家！',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture2Url: '',
             picture3Url: ''
         },
@@ -557,7 +557,7 @@ const initCommentDatabase = () => {
             like: 187,
             evaluation: 'none',
             content: '惊艳！没想到食堂也能做出这么好吃的菜。食材新鲜，烹饪技术也很专业。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture3Url: ''
         },
@@ -570,7 +570,7 @@ const initCommentDatabase = () => {
             like: 76,
             evaluation: 'none',
             content: '还行吧，偶尔来吃一次挺好的。不过高峰期要早点来，不然没位置。',
-            pictrue1Url: '',
+            picture1Url: '',
             picture2Url: '',
             picture3Url: ''
         },
@@ -583,7 +583,7 @@ const initCommentDatabase = () => {
             like: 134,
             evaluation: 'none',
             content: '很喜欢这里的氛围，菜品也很合我口味。而且老板很热情，每次都会推荐新菜品。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture3Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
         },
@@ -596,7 +596,7 @@ const initCommentDatabase = () => {
             like: 92,
             evaluation: 'none',
             content: '性价比高，味道也可以。就是希望能多一些菜品选择就更好了。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture2Url: '',
             picture3Url: ''
         },
@@ -609,7 +609,7 @@ const initCommentDatabase = () => {
             like: 165,
             evaluation: 'none',
             content: '真的很不错！尤其是他们的特色菜，必点！强烈安利给大家。',
-            pictrue1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+            picture1Url: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
             picture2Url: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
             picture3Url: ''
         },
@@ -622,7 +622,7 @@ const initCommentDatabase = () => {
             like: 58,
             evaluation: 'none',
             content: '中规中矩吧，没有特别惊艳，但也不难吃。价格合理，偶尔换换口味可以来。',
-            pictrue1Url: '',
+            picture1Url: '',
             picture2Url: '',
             picture3Url: ''
         }
@@ -680,7 +680,7 @@ const getStallCommentList = (config) => {
             like: 10,
             evaluation: 'none',
             content: '这是一条强制显示的测试评论，如果你看到这条消息，说明Mock数据初始化有问题。',
-            pictrue1Url: '',
+            picture1Url: '',
             picture2Url: '',
             picture3Url: ''
         })

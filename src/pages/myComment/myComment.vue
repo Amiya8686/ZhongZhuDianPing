@@ -27,7 +27,7 @@ const getMyComments = async () => {
       pageIndex: pagination.currentPage
     })
     
-    commentList.value = data.comments
+    commentList.value = data.comments;
     pagination.totalPageNum = data.totalPageNum
     pagination.currentPage = data.pageIndex
   } catch (error) {
@@ -148,13 +148,13 @@ onMounted(() => {
           </div>
           
           <!-- 图片区域 -->
-          <div v-if="comment.pictrue1Url || comment.picture2Url || comment.picture3Url" class="imageArea">
+          <div v-if="comment.picture1Url || comment.picture2Url || comment.picture3Url" class="imageArea">
             <div 
-              v-if="comment.pictrue1Url"
+              v-if="comment.picture1Url"
               class="imageItem"
-              @click="handlePreviewImage(comment.pictrue1Url)"
+              @click="handlePreviewImage(comment.picture1Url)"
             >
-              <img :src="comment.pictrue1Url" alt="图片1">
+              <img :src="comment.picture1Url" alt="图片1">
             </div>
             <div 
               v-if="comment.picture2Url"
