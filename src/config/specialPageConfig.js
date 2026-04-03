@@ -28,7 +28,6 @@ const serverPageToGo = {
 }
 
 
-
 //获取要跳转到的页面
 const getClientPageToGo = (url)=>{
     for(const item of clientSpecialPages){
