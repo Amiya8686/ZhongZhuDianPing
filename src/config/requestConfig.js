@@ -18,8 +18,8 @@ const envConfig = {
     }
 }
 
-
 export default{
     ...envConfig[env],
     isMock
 }
+
