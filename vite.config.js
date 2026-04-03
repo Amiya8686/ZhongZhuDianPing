@@ -52,6 +52,7 @@ export default defineConfig({
         myComment: path.resolve(__dirname, 'user/myComment.html'),
         personalInfo: path.resolve(__dirname, 'user/personalInfo.html'),
         signUp: path.resolve(__dirname, 'user/signUp.html'),
+        background: path.resolve(__dirname, 'background/index.html'),
       }
     }
   }

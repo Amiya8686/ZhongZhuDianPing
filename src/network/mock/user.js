@@ -3,32 +3,35 @@
 
 //将url查询参数转为JS对象
 function parseURLParams(url) {
-  const searchParams = new URL(url).searchParams;
-  const params = {};
-  for (const [key, value] of searchParams.entries()) {
-    params[key] = value;
+  try {
+    const urlObj = new URL(url, 'http://localhost');
+    const searchParams = urlObj.searchParams;
+    const params = {};
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+    return params;
+  } catch (e) {
+    console.error('URL解析失败:', e);
+    return {};
   }
-  return params;
 }
-
-
-
 
 
 //模拟用户数据库
 const userDataBase = [
-    // {
-    //     userName:"ISeRi_NiNa",
-    //     password:"123456",
-    //     nickName:"NiNa",
-    //     avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
-    // },
-    // {
-    //     userName:"AWa_SuBaRu",
-    //     password:"654321",
-    //     nickName:"486",
-    //     avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
-    // },
+    {
+        userName:"ISeRi_NiNa",
+        password:"123456",
+        nickName:"NiNa",
+        avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
+    },
+    {
+        userName:"AWa_SuBaRu",
+        password:"654321",
+        nickName:"486",
+        avatarUrl:"/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg",
+    },
     {
         userName:"WaGuRi_KaORuKo",
         password:"13579",
@@ -44,7 +47,6 @@ const userDataBase = [
 //失败：undefined
 //验证token（给需要验证token的函数用）
 const checkToken = (config)=>{
-    console.log(config.url)
     const search = parseURLParams(config.url)
     const token = search.token;
 
@@ -79,6 +81,10 @@ const checkTokenApi = (config)=>{
 
 
 //登陆验证
+//输入: config对象, body中包含{userName,password}
+//输出: 响应对象
+//成功: {code:200}
+//失败：{code, msg:"登陆验证失败"}
 const login = (config)=>{
     const {userName,password} = JSON.parse(config.body)
     const validUser = userDataBase.filter((item)=>{
@@ -103,7 +109,52 @@ const login = (config)=>{
         }
     }
 }
+
+//注册
+//输入: config对象，body中包含{userName, nickName, password}
+//输出: 响应对象
+//成功: {code: 200, msg: "注册成功"}
+//失败: {code: 999, msg: "用户名已存在"}
+const signUp = (config)=>{
+    const {userName, nickName, password} = JSON.parse(config.body)
+    
+    //检查用户名是否已存在
+    const existingUser = userDataBase.filter((item)=>{
+        return item.userName === userName;
+    })
+    
+    if(existingUser.length > 0){
+        console.log("[signUp] 用户名已存在:", userName)
+        return{
+            code:999,
+            msg:"用户名已存在"
+        }
+    }
+    
+    //创建新用户并添加到数据库
+    const newUser = {
+        userName: userName,
+        password: password,
+        nickName: nickName,
+        avatarUrl: "/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg",
+    }
+    userDataBase.push(newUser)
+    
+    console.log("[signUp] 注册成功，新用户:", newUser)
+    console.log("[signUp] 当前用户总数:", userDataBase.length)
+
+    return{
+        code:200,
+        msg:"注册成功"
+    }
+}
+
 //请求用户信息
+//输入: config对象,(测试阶段,token在查询参数中)
+//输出: 响应对象
+//成功: {code:200,data:{userName,nickName,avatarUrl}}
+//失败: {code:999,msg:对应错误信息}
+//token验证失败： {code:998,msg:"token验证失败"}
 const getUserInfo = (config)=>{
     const userName = checkToken(config)
     //token验证成功
@@ -129,7 +180,62 @@ const getUserInfo = (config)=>{
     }
 }
 
+//修改用户信息
+//输入: config对象,(body部分为用formData格式编码的用户信息,nickName和avatar文件)
+//输出: 响应对象
+//成功：{code:200}
+//失败: {code:999 msg:对应错误信息}
+//token验证失败： {code:998,msg:"token验证失败"}
+const editUserInfo = (config)=>{
+    const userName = checkToken(config)
+    if(!userName){
+        return {
+            code:998,
+            msg:"token 验证失败"
+        }
+    }
+    //JS中没有解析formData格式的接口，就在控制台输出一下检测一下就行了
+    console.log("mockjs 修改用户信息成功")
+
+    return{
+        code:200
+    }
+}
+
+//修改用户密码
+//输入: config对象,(body部分为用formData格式编码的新密码)
+//输出: 响应对象
+//成功：{code:200}
+//失败: {code:999 msg:对应错误信息}
+//token验证失败： {code:998,msg:"token验证失败"}
+const editPassword = (config)=>{
+    //验证token
+    const userName = checkToken(config)
+    if(!userName){
+        return {
+            code:998,
+            msg:"token 验证失败"
+        }
+    }
+    
+    //获取信息
+    const {password,newPassword} = JSON.parse(config.body)
+
+    //找到用户并更新密码
+    const index = userDataBase.findIndex(item =>{return item.userName===userName})
+    if(userDataBase[index].password!=password){
+        return{
+            code:999,
+            msg:"旧密码错误"
+        }
+    }else{
+        userDataBase[index].password=newPassword
+        return{
+            code:200,
+            msg:"修改密码成功"
+        }
+    }
+}
 
 
-
-export default{checkToken,checkTokenApi,login,getUserInfo}
+export default{checkToken, checkTokenApi, login, signUp, getUserInfo, editUserInfo, editPassword}

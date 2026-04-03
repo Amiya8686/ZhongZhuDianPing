@@ -5,21 +5,21 @@ const isMock = true;                  //是否启动mock
 
 const envConfig = {
     development:{
-        baseURL:"https://ljysb/api",
-        mockURL:"https://ljysb/api"
+        baseURL:"/api",
+        mockURL:"https:/sbljy/api"
     },
     test:{
-        baseURL:"https://ljysb/api",
-        mockURL:"https://ljysb/api"
+        baseURL:"/api",
+        mockURL:"/api"
     },
     production:{
-        baseURL:"https://ljysb/api",
-        mockURL:"https://ljysb/api"
+        baseURL:"/api",
+        mockURL:"/api"
     }
 }
-
 
 export default{
     ...envConfig[env],
     isMock
 }
+
