@@ -45,6 +45,8 @@ httpInstance.interceptors.response.use(res=>{
 })
 
 
+
+
 //封装axios，灵活配置
 const request = (config)=>{
     if(!config.contentType){
@@ -109,8 +111,6 @@ const request = (config)=>{
     //发送请求
     return httpInstance(option);
 }
-
-
 
 //request函数说明
 //作用：灵活配置axios请求

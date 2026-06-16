@@ -1,6 +1,7 @@
 <script setup>
 import {ref,getCurrentInstance,onMounted} from "vue"
 import { ArrowDown, StarFilled } from '@element-plus/icons-vue'
+import IconImg from '@/assets/imgs/icon/icon.svg'
 const {proxy} = getCurrentInstance()
 
 
@@ -185,8 +186,11 @@ onMounted(()=>{
     <!-- 顶部导航栏 -->
      <div class="top-bar">
       <div class="title" @click="goToHome">
-        <span class="main-title">中珠点评</span>
-        <span class="sub-title">美食点评</span>
+        <img :src="IconImg" class="title-icon" />
+        <div class="title-text">
+          <span class="main-title">中珠点评</span>
+          <span class="sub-title">美食点评</span>
+        </div>
       </div>
       <div class="right-section">
         <!-- 已登录状态 -->
@@ -371,13 +375,27 @@ onMounted(()=>{
 
 .title {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
   transition: opacity 0.3s;
 }
 
 .title:hover {
   opacity: 0.9;
+}
+
+.title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.title-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .main-title {

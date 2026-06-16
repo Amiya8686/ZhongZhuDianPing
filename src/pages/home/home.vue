@@ -2,6 +2,7 @@
 import {reactive, getCurrentInstance, onMounted, ref, computed} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
 import { ArrowDown } from '@element-plus/icons-vue' // <-- 添加这一行
+import IconImg from '@/assets/imgs/icon/icon.svg'
 const {proxy} = getCurrentInstance()
 
 //用户信息
@@ -80,9 +81,9 @@ const handleFoodMap = () => {
   ElMessage.info('美食地图功能正在开发中，敬请期待～')
 }
 
-//处理额外功能点击（功能待确定）
-const handleExtraFeature = () => {
-  ElMessage.info('更多精彩功能正在策划中，敬请期待～')
+//跳转到美食工坊页
+const goToMagicWorkShop = () => {
+  window.location.href = '/magicWorkShop.html'
 }
 
 //跳转到个人信息页
@@ -146,8 +147,11 @@ onMounted(() => {
     <header class="navbar">
       <div class="navContent">
         <div class="logo" @click="() => window.location.href = '/home'">
-          <h1>中珠点评</h1>
-          <span class="logoSubtitle">校园美食点评平台</span>
+          <img :src="IconImg" class="logo-icon" />
+          <div class="logo-text">
+            <h1>中珠点评</h1>
+            <span class="logoSubtitle">校园美食点评平台</span>
+          </div>
         </div>
         
         <div class="userSection">
@@ -234,10 +238,10 @@ onMounted(() => {
               <p>地图导航，快速找到心仪的美食位置</p>
             </el-card>
             
-            <el-card class="featureCard" shadow="hover" @click="handleExtraFeature">
+            <el-card class="featureCard" shadow="hover" @click="goToMagicWorkShop">
               <div class="cardIcon">✨</div>
-              <h3>额外功能</h3>
-              <p>更多精彩功能，敬请期待</p>
+              <h3>美食工访</h3>
+              <p>开一段奇妙的冒险</p>
             </el-card>
           </div>
         </div>
@@ -277,13 +281,29 @@ onMounted(() => {
     justify-content: space-between;
     
     .logo{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
       cursor: pointer;
       transition: opacity 0.3s;
-      
+
       &:hover{
         opacity: 0.8;
       }
-      
+
+      .logo-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        flex-shrink: 0;
+      }
+
+      .logo-text {
+        display: flex;
+        flex-direction: column;
+      }
+
       h1{
         margin: 0;
         font-size: 24px;
