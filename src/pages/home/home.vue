@@ -80,9 +80,9 @@ const handleFoodMap = () => {
   ElMessage.info('美食地图功能正在开发中，敬请期待～')
 }
 
-//处理额外功能点击（功能待确定）
-const handleExtraFeature = () => {
-  ElMessage.info('更多精彩功能正在策划中，敬请期待～')
+//跳转到美食工坊页
+const goToMagicWorkShop = () => {
+  window.location.href = '/magicWorkShop.html'
 }
 
 //跳转到个人信息页
@@ -234,10 +234,10 @@ onMounted(() => {
               <p>地图导航，快速找到心仪的美食位置</p>
             </el-card>
             
-            <el-card class="featureCard" shadow="hover" @click="handleExtraFeature">
+            <el-card class="featureCard" shadow="hover" @click="goToMagicWorkShop">
               <div class="cardIcon">✨</div>
-              <h3>额外功能</h3>
-              <p>更多精彩功能，敬请期待</p>
+              <h3>美食工访</h3>
+              <p>开一段奇妙的冒险</p>
             </el-card>
           </div>
         </div>

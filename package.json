@@ -11,8 +11,10 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.13.1",
+    "dompurify": "^3.4.10",
     "element-plus": "^2.11.5",
     "less": "^4.4.2",
+    "marked": "^18.0.5",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
   },
