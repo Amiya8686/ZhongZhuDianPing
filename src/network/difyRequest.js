@@ -52,7 +52,7 @@ const chatNetworkStream = (query, conversationId = '', onChunk) => {
             try {
               const dataJson = JSON.parse(line.slice(5).trim());
               
-              if (dataJson.event === 'text_chunk' || dataJson.event === 'message') {
+              if (dataJson.event === 'text_chunk' || dataJson.event === 'agent_message') {
                 const text = dataJson.answer || dataJson.text || '';
                 
                 if (text) {

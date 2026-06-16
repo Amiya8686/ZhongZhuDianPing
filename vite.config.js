@@ -23,7 +23,7 @@ const DIFY_INFO = {
 // ==================== 💡 业务应用配置（以后你只改这里就行） ====================
 const DIFY_APP_INFO = {
   foodConsultant: {
-    apiKey: 'Bearer app-rjVFNSerNFWDyJSO3ddBuIK8',
+    apiKey: 'Bearer app-Fu342lxNXpwrVgkBDqPVBhwn',
     type: 'chatFlow'
   },
   intelligentCommentGeneration: {

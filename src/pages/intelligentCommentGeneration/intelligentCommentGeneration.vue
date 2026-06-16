@@ -1,6 +1,7 @@
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue'
 import { ArrowDown } from '@element-plus/icons-vue'
+import IconImg from '@/assets/imgs/icon/icon.svg'
 import MagicWorkShopTime from '@/components/magicWorkShopTime.vue'
 import MagicWorkShopSelector from '@/components/magicWorkShopSelector.vue'
 
@@ -87,8 +88,11 @@ onMounted(() => {
   <div class="body" v-show="isShowBody">
     <div class="top-bar">
       <div class="title" @click="goToHome">
-        <span class="main-title">中珠点评</span>
-        <span class="sub-title">美食工坊</span>
+        <img :src="IconImg" class="title-icon" />
+        <div class="title-text">
+          <span class="main-title">中珠点评</span>
+          <span class="sub-title">美食工坊</span>
+        </div>
       </div>
       <div class="nav-links">
         <el-button link class="nav-btn" @click="goToHome">首页</el-button>
@@ -155,13 +159,27 @@ onMounted(() => {
 
 .title {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
   transition: opacity 0.3s;
 }
 
 .title:hover {
   opacity: 0.8;
+}
+
+.title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.title-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .main-title {

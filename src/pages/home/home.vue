@@ -2,6 +2,7 @@
 import {reactive, getCurrentInstance, onMounted, ref, computed} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
 import { ArrowDown } from '@element-plus/icons-vue' // <-- 添加这一行
+import IconImg from '@/assets/imgs/icon/icon.svg'
 const {proxy} = getCurrentInstance()
 
 //用户信息
@@ -146,8 +147,11 @@ onMounted(() => {
     <header class="navbar">
       <div class="navContent">
         <div class="logo" @click="() => window.location.href = '/home'">
-          <h1>中珠点评</h1>
-          <span class="logoSubtitle">校园美食点评平台</span>
+          <img :src="IconImg" class="logo-icon" />
+          <div class="logo-text">
+            <h1>中珠点评</h1>
+            <span class="logoSubtitle">校园美食点评平台</span>
+          </div>
         </div>
         
         <div class="userSection">
@@ -277,13 +281,29 @@ onMounted(() => {
     justify-content: space-between;
     
     .logo{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
       cursor: pointer;
       transition: opacity 0.3s;
-      
+
       &:hover{
         opacity: 0.8;
       }
-      
+
+      .logo-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        flex-shrink: 0;
+      }
+
+      .logo-text {
+        display: flex;
+        flex-direction: column;
+      }
+
       h1{
         margin: 0;
         font-size: 24px;

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue'
 import { ArrowDown } from '@element-plus/icons-vue'
+import IconImg from '@/assets/imgs/icon/icon.svg'
 import MagicWorkShopTime from '@/components/magicWorkShopTime.vue'
 import MagicWorkShopSelector from '@/components/magicWorkShopSelector.vue'
 import { marked } from 'marked'
@@ -153,8 +154,11 @@ onMounted(() => {
   <div class="body" v-show="isShowBody">
     <div class="top-bar">
       <div class="title" @click="goToHome">
-        <span class="main-title">中珠点评</span>
-        <span class="sub-title">美食工坊</span>
+        <img :src="IconImg" class="title-icon" />
+        <div class="title-text">
+          <span class="main-title">中珠点评</span>
+          <span class="sub-title">美食工坊</span>
+        </div>
       </div>
       <div class="nav-links">
         <el-button link class="nav-btn" @click="goToHome">首页</el-button>
@@ -186,6 +190,15 @@ onMounted(() => {
       <!-- 左侧主画布 -->
       <div class="main-canvas">
         <div class="chat-panel">
+          <!-- 对话人信息 -->
+          <div class="chat-header">
+            <img :src="FoodConsultantImg" class="chat-header-avatar" />
+            <div class="chat-header-info">
+              <span class="chat-header-name">布鲁斯</span>
+              <span class="chat-header-desc">美食小顾问</span>
+            </div>
+          </div>
+
           <!-- 消息区域 -->
           <div class="chat-messages" ref="chatContainer">
             <div v-if="messages.length === 0" class="chat-empty">
@@ -271,13 +284,27 @@ onMounted(() => {
 
 .title {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
   transition: opacity 0.3s;
 }
 
 .title:hover {
   opacity: 0.8;
+}
+
+.title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.title-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .main-title {
@@ -377,6 +404,40 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+/* 对话人信息 */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+
+  .chat-header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .chat-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .chat-header-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .chat-header-desc {
+      font-size: 12px;
+      color: #999;
+    }
+  }
 }
 
 .chat-messages {
