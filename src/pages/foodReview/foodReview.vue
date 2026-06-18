@@ -397,6 +397,18 @@ onMounted(()=>{
   flex-direction: column;
 }
 
+.title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.title-text {
+  display: flex;
+  flex-direction: column;
+}
+
 .main-title {
   font-size: 24px;
   color: white;
