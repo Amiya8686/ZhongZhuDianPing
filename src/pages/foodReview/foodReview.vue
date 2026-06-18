@@ -353,7 +353,9 @@ onMounted(()=>{
 .body {
   width: 100%;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #fef6e4;
+  background-image: radial-gradient(#f3d2c1 1px, transparent 1px);
+  background-size: 20px 20px;
   padding-bottom: 40px;
 }
 
@@ -361,16 +363,13 @@ onMounted(()=>{
 .top-bar {
   width: 100%;
   height: 70px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff8e3c;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(255, 142, 60, 0.3);
   box-sizing: border-box;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 .title {
@@ -383,7 +382,19 @@ onMounted(()=>{
 }
 
 .title:hover {
-  opacity: 0.9;
+  opacity: 0.8;
+}
+
+.title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.title-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .title-icon {
@@ -401,19 +412,21 @@ onMounted(()=>{
 .main-title {
   font-size: 24px;
   color: white;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-weight: 800;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+  letter-spacing: 2px;
 }
 
 .sub-title {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
   margin-top: 2px;
 }
 
 .right-section {
   display: flex;
   align-items: center;
+  gap: 15px;
 }
 
 .user-info {
@@ -422,25 +435,24 @@ onMounted(()=>{
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 5px 15px;
     border-radius: 20px;
-    transition: background-color 0.3s;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
     outline: none;
-    
+    border: none;
+
     &:hover {
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
     }
 
-    &:focus, &:focus-visible {
-      outline: none;
-    }
-    
     .user-name {
       font-size: 14px;
       color: white;
-      font-weight: 500;
+      font-weight: 600;
     }
-    
+
     .el-icon {
       color: white;
     }
@@ -652,13 +664,13 @@ onMounted(()=>{
 
 /* Element Plus 样式覆盖 */
 :deep(.el-button--primary) {
-  --el-button-bg-color: #667eea;
-  --el-button-border-color: #667eea;
-  --el-button-hover-bg-color: #5a6fd6;
-  --el-button-hover-border-color: #5a6fd6;
+  --el-button-bg-color: #ff8e3c;
+  --el-button-border-color: #ff8e3c;
+  --el-button-hover-bg-color: #e07b30;
+  --el-button-hover-border-color: #e07b30;
 }
 
 :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background-color: #667eea;
+  background-color: #ff8e3c;
 }
 </style>

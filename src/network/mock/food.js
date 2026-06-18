@@ -29,7 +29,7 @@ const stallDataBase = [
     meanPrice: 25.0,
     canteen: '榕园食堂',
     signatureDish: '烧鸭饭',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    pictureUrl: '/src/assets/imgs/dish/1.png',
     type: '烧腊',
     introduction: '正宗广式烧腊，酱汁浓郁，肉质鲜嫩。'
   },
@@ -40,7 +40,7 @@ const stallDataBase = [
     meanPrice: 18.0,
     canteen: '荔园食堂',
     signatureDish: '招牌麻辣烫',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    pictureUrl: '/src/assets/imgs/dish/2.png',
     type: '粉面',
     introduction: '选料丰富，汤底香浓，辣度可调。'
   },
@@ -51,7 +51,7 @@ const stallDataBase = [
     meanPrice: 22.0,
     canteen: '槿园食堂',
     signatureDish: '双层芝士牛肉堡',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    pictureUrl: '/src/assets/imgs/dish/3.png',
     type: '汉堡',
     introduction: '新鲜牛肉饼，芝士浓郁，超大份量。'
   },
@@ -62,7 +62,7 @@ const stallDataBase = [
     meanPrice: 15.0,
     canteen: '若海食堂',
     signatureDish: '兰州拉面',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    pictureUrl: '/src/assets/imgs/dish/4.png',
     type: '粉面',
     introduction: '现拉现煮，劲道十足，汤头鲜美。'
   },
@@ -73,7 +73,7 @@ const stallDataBase = [
     meanPrice: 20.0,
     canteen: '榕园食堂',
     signatureDish: '黄焖鸡',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    pictureUrl: '/src/assets/imgs/dish/5.png',
     type: '烩饭',
     introduction: '鸡肉嫩滑，酱汁入味，配菜丰富。'
   },
@@ -84,7 +84,7 @@ const stallDataBase = [
     meanPrice: 12.0,
     canteen: '荔园食堂',
     signatureDish: '芒果汁',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    pictureUrl: '/src/assets/imgs/dish/1.png',
     type: '自选',
     introduction: '新鲜水果现榨，无添加，健康美味。'
   },
@@ -95,7 +95,7 @@ const stallDataBase = [
     meanPrice: 28.0,
     canteen: '槿园食堂',
     signatureDish: '铁板牛肉',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    pictureUrl: '/src/assets/imgs/dish/2.png',
     type: '烧腊',
     introduction: '现场制作，香气四溢，口感极佳。'
   },
@@ -106,7 +106,7 @@ const stallDataBase = [
     meanPrice: 16.0,
     canteen: '若海食堂',
     signatureDish: '三菜一饭',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    pictureUrl: '/src/assets/imgs/dish/3.png',
     type: '自选',
     introduction: '菜品多样，自由搭配，经济实惠。'
   },
@@ -117,7 +117,7 @@ const stallDataBase = [
     meanPrice: 19.0,
     canteen: '榕园食堂',
     signatureDish: '韩式石锅拌饭',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    pictureUrl: '/src/assets/imgs/dish/4.png',
     type: '烩饭',
     introduction: '正宗韩式风味，锅巴香脆，营养均衡。'
   },
@@ -128,7 +128,7 @@ const stallDataBase = [
     meanPrice: 14.0,
     canteen: '荔园食堂',
     signatureDish: '皮蛋瘦肉粥',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    pictureUrl: '/src/assets/imgs/dish/5.png',
     type: '粉面',
     introduction: '熬制3小时，米粒绵软，营养丰富。'
   },
@@ -139,7 +139,7 @@ const stallDataBase = [
     meanPrice: 23.0,
     canteen: '槿园食堂',
     signatureDish: '香辣鸡腿堡',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg',
+    pictureUrl: '/src/assets/imgs/dish/1.png',
     type: '汉堡',
     introduction: '外酥里嫩，香辣可口，配薯条更佳。'
   },
@@ -150,7 +150,7 @@ const stallDataBase = [
     meanPrice: 26.0,
     canteen: '若海食堂',
     signatureDish: '照烧鸡排饭',
-    pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg',
+    pictureUrl: '/src/assets/imgs/dish/2.png',
     type: '烩饭',
     introduction: '日式风味，酱汁香甜，肉质软嫩。'
   }
@@ -282,35 +282,35 @@ const getStallInfo = (config)=>{
             name: stall.signatureDish,
             price: stall.meanPrice,
             rating: Number(stall.rating.toFixed(1)),
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+            pictureUrl: '/src/assets/imgs/dish/3.png'
         },
         {
             ID: stallID * 100 + 2,
             name: '招牌套餐',
             price: stall.meanPrice + 5,
             rating: Number((stall.rating - 0.1).toFixed(1)),
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+            pictureUrl: '/src/assets/imgs/dish/4.png'
         },
         {
             ID: stallID * 100 + 3,
             name: '超值单人餐',
             price: stall.meanPrice - 2,
             rating: Number((stall.rating - 0.2).toFixed(1)),
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+            pictureUrl: '/src/assets/imgs/dish/5.png'
         },
         {
             ID: stallID * 100 + 4,
             name: '特色小吃',
             price: 8,
             rating: Number((stall.rating - 0.3).toFixed(1)),
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg'
+            pictureUrl: '/src/assets/imgs/dish/1.png'
         },
         {
             ID: stallID * 100 + 5,
             name: '饮料',
             price: 5,
             rating: Number((stall.rating - 0.5).toFixed(1)),
-            pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg'
+            pictureUrl: '/src/assets/imgs/dish/2.png'
         }
     ]
     
@@ -354,18 +354,18 @@ let dishDatabase = {}
 //初始化菜品数据库
 const initDishDatabase = () => {
     const dishes = [
-        { ID: 1, name: '烧鸭饭', price: 25, like: 128, bad: 5, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
-        { ID: 2, name: '烧肉饭', price: 23, like: 95, bad: 8, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
-        { ID: 3, name: '烧鹅饭', price: 28, like: 156, bad: 3, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
-        { ID: 4, name: '叉烧饭', price: 22, like: 88, bad: 6, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
-        { ID: 5, name: '白切鸡饭', price: 24, like: 102, bad: 4, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
-        { ID: 6, name: '双拼饭', price: 26, like: 145, bad: 7, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
-        { ID: 7, name: '三拼饭', price: 30, like: 178, bad: 2, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
-        { ID: 8, name: '烧腊拼盘', price: 35, like: 203, bad: 1, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
-        { ID: 9, name: '油鸡饭', price: 23, like: 76, bad: 9, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
-        { ID: 10, name: '卤水拼盘', price: 32, like: 134, bad: 5, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
-        { ID: 11, name: '咸鱼鸡粒炒饭', price: 20, like: 67, bad: 12, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar1.jpg' },
-        { ID: 12, name: '腊味煲仔饭', price: 28, like: 189, bad: 4, pictureUrl: '/src/assets/imgs/defaultAvatar/defaultAvatar2.jpg' },
+        { ID: 1, name: '烧鸭饭', price: 25, like: 128, bad: 5, pictureUrl: '/src/assets/imgs/dish/3.png' },
+        { ID: 2, name: '烧肉饭', price: 23, like: 95, bad: 8, pictureUrl: '/src/assets/imgs/dish/4.png' },
+        { ID: 3, name: '烧鹅饭', price: 28, like: 156, bad: 3, pictureUrl: '/src/assets/imgs/dish/5.png' },
+        { ID: 4, name: '叉烧饭', price: 22, like: 88, bad: 6, pictureUrl: '/src/assets/imgs/dish/1.png' },
+        { ID: 5, name: '白切鸡饭', price: 24, like: 102, bad: 4, pictureUrl: '/src/assets/imgs/dish/2.png' },
+        { ID: 6, name: '双拼饭', price: 26, like: 145, bad: 7, pictureUrl: '/src/assets/imgs/dish/3.png' },
+        { ID: 7, name: '三拼饭', price: 30, like: 178, bad: 2, pictureUrl: '/src/assets/imgs/dish/4.png' },
+        { ID: 8, name: '烧腊拼盘', price: 35, like: 203, bad: 1, pictureUrl: '/src/assets/imgs/dish/5.png' },
+        { ID: 9, name: '油鸡饭', price: 23, like: 76, bad: 9, pictureUrl: '/src/assets/imgs/dish/1.png' },
+        { ID: 10, name: '卤水拼盘', price: 32, like: 134, bad: 5, pictureUrl: '/src/assets/imgs/dish/2.png' },
+        { ID: 11, name: '咸鱼鸡粒炒饭', price: 20, like: 67, bad: 12, pictureUrl: '/src/assets/imgs/dish/3.png' },
+        { ID: 12, name: '腊味煲仔饭', price: 28, like: 189, bad: 4, pictureUrl: '/src/assets/imgs/dish/4.png' },
     ]
     
     dishes.forEach(dish => {

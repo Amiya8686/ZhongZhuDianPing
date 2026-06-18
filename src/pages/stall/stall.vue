@@ -138,6 +138,11 @@ const viewPanorama = () => {
   // TODO: 打开全景图查看器
 }
 
+// 跳转到唐探长评析
+const goToStallAnalysis = () => {
+  globalThis.open(`/magicWorkshop/stallIntelligentAnalysis.html?stallID=${stallID.value}`, '_blank')
+}
+
 // 点赞评论
 const likeComment = async (comment) => {
   try {
@@ -241,6 +246,9 @@ const scrollRight = () => {
             <div class="header-actions">
               <el-button type="primary" size="large" round @click="viewPanorama">
                 <el-icon><Picture /></el-icon> 查看全景图
+              </el-button>
+              <el-button type="warning" size="large" round @click="goToStallAnalysis">
+                🔍 看看唐探长的评析
               </el-button>
             </div>
           </div>

@@ -115,4 +115,113 @@ const chatNetworkStream = (query, conversationId = '', onChunk) => {
   });
 }
 
-export { chatNetworkStream }
+/** 🔮 智能评论生成多轮交互函数
+ * @param {Object} messages - 本轮发送的业务对象 (内部自动执行 JSON 序列化)
+ * @param {string} conversationID - 会话 ID (首轮对话传空字符串 "")
+ * @returns {Promise<Object>} 清洗及反序列化后的纯 JavaScript 业务数据对象
+ */
+const interactMagicPot = (messages, conversationID = '') => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const baseUrl = difyConfig.baseUrl; 
+      const appParam = difyConfig.apps.intelligentCommentGeneration; 
+
+      // 1. 自动序列化：将传入的业务对象转换为符合传输契约的 JSON 字符串
+      const serializedQuery = JSON.stringify(messages);
+
+      // 2. 发起标准的 Dify 后端请求
+      const response = await fetch(`${baseUrl}?app=${appParam}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          inputs: {},
+          query: serializedQuery,
+          response_mode: 'streaming',
+          conversation_id: conversationID,
+          user: 'student_demo_user'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`智能评论生成请求失败, HTTP状态码: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      
+      let accumulatedText = ''; // 累加所有的文本 Chunk
+      let finalConversationID = conversationID;
+      let buffer = '';
+
+      // 3. 多生命周期流式接收与累加
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (line.startsWith('data:')) {
+            try {
+              const dataJson = JSON.parse(line.slice(5).trim());
+              
+              // 提取文本块或 Agent 消息
+              if (dataJson.event === 'text_chunk' || dataJson.event === 'agent_message') {
+                const text = dataJson.answer || dataJson.text || '';
+                if (text) {
+                  accumulatedText += text;
+                }
+              }
+
+              // 记录最终会话 ID
+              if (dataJson.conversation_id) {
+                finalConversationID = dataJson.conversation_id;
+              }
+            } catch (e) {
+              // 忽略解析单行不完整导致的异常
+            }
+          }
+        }
+      }
+
+      // 4. 数据高防清洗与反序列化
+      let cleanedText = accumulatedText.trim();
+
+      // 防御 A：物理剔除深度思考模型可能夹杂的思考内容 <think>...</think>
+      cleanedText = cleanedText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+
+      // 防御 B：稳健剥离大模型输出可能附带的 Markdown 代码块标记 (```json ... ```)
+      const markdownRegex = /```json\s*([\s\S]*?)\s*```/;
+      const match = cleanedText.match(markdownRegex);
+      let jsonStr = match ? match[1].trim() : cleanedText;
+
+      // 防御 C：物理绝杀大写 Python 风格的 True/False，强行转回 JS 标准全小写布尔值
+      jsonStr = jsonStr
+        .replace(/:\s*True\b/g, ': true')
+        .replace(/:\s*False\b/g, ': false');
+
+      // 5. 最终反序列化解析并 Resolve 返回
+      try {
+        const parsedData = JSON.parse(jsonStr);
+        resolve({
+          conversationID: finalConversationID,
+          data: parsedData
+        });
+      } catch (parseError) {
+        // 如果因极致异常导致 JSON 无法解析，在此处进行优雅业务兜底，防止前端渲染崩塌
+        console.error('[MagicPot JSON清洗解析失败]:', parseError, '原始文本:', accumulatedText);
+        reject(new Error('魔法评论数据清洗解析异常'));
+      }
+
+    } catch (error) {
+      console.error('[MagicPot 通信异常]:', error);
+      reject(error);
+    }
+  });
+}
+
+export { chatNetworkStream, interactMagicPot }

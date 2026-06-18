@@ -27,8 +27,8 @@ const DIFY_APP_INFO = {
     type: 'chatFlow'
   },
   intelligentCommentGeneration: {
-    apiKey: 'Bearer xxx',
-    type: 'workFlow'
+    apiKey: 'Bearer app-zfFyJDca6nMpJYG5Os7yuAx7',
+    type: 'chatFlow'
   },
   stallIntelligentAnalysis: {
     apiKey: 'Bearer xxx',

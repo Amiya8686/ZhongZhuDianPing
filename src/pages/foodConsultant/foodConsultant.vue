@@ -94,6 +94,11 @@ const renderMarkdown = (content) => {
   return DOMPurify.sanitize(rawHtml)
 }
 
+const clearChat = () => {
+  messages.value = []
+  conversationId.value = ''
+}
+
 const scrollToBottom = () => {
   if (chatContainer.value) {
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight
@@ -141,6 +146,21 @@ const handleKeydown = (e) => {
     e.preventDefault()
     sendMessage()
   }
+}
+
+// 预设问题
+const presetVisible = ref(false)
+const presets = [
+  '今天食堂有什么好吃的菜品推荐？',
+  '榕园食堂的美味烧腊档口怎么样？',
+  '荔园食堂一般几点开门营业？',
+  '蜜汁叉烧饭好吃吗，值得尝试吗？'
+]
+
+const sendPreset = (question) => {
+  presetVisible.value = false
+  inputText.value = question
+  sendMessage()
 }
 
 onMounted(() => {
@@ -197,6 +217,8 @@ onMounted(() => {
               <span class="chat-header-name">布鲁斯</span>
               <span class="chat-header-desc">美食小顾问</span>
             </div>
+            <el-button class="clear-btn" link @click="clearChat">清空聊天</el-button>
+            <span class="chat-disclaimer">即便是强大的布鲁斯也会偶尔犯错</span>
           </div>
 
           <!-- 消息区域 -->
@@ -231,6 +253,32 @@ onMounted(() => {
 
           <!-- 输入区域 -->
           <div class="chat-input-area">
+            <el-popover
+              v-model:visible="presetVisible"
+              placement="top-start"
+              :width="320"
+              trigger="click"
+            >
+              <template #reference>
+                <el-button
+                  :disabled="isStreaming"
+                  class="preset-btn"
+                  size="large"
+                >
+                  💡 快捷提问
+                </el-button>
+              </template>
+              <div class="preset-list">
+                <div
+                  v-for="(q, i) in presets"
+                  :key="i"
+                  class="preset-item"
+                  @click="sendPreset(q)"
+                >
+                  {{ q }}
+                </div>
+              </div>
+            </el-popover>
             <el-input
               v-model="inputText"
               placeholder="输入你的问题..."
@@ -414,6 +462,7 @@ onMounted(() => {
   padding: 16px 24px;
   border-bottom: 1px solid #f0f0f0;
   background: #fafafa;
+  position: relative;
 
   .chat-header-avatar {
     width: 40px;
@@ -426,6 +475,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    flex: 1;
 
     .chat-header-name {
       font-size: 15px;
@@ -438,6 +488,23 @@ onMounted(() => {
       color: #999;
     }
   }
+
+  .clear-btn {
+    color: #ccc;
+    font-size: 13px;
+
+    &:hover {
+      color: #ff6b6b;
+    }
+  }
+}
+
+.chat-disclaimer {
+  font-size: 11px;
+  color: #bbb;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .chat-messages {
@@ -618,6 +685,33 @@ onMounted(() => {
       background: #e07b30;
       border-color: #e07b30;
     }
+  }
+
+  .preset-btn {
+    flex-shrink: 0;
+  }
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preset-item {
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #fff7f0;
+    border-color: #ff8e3c;
+    color: #ff8e3c;
   }
 }
 
