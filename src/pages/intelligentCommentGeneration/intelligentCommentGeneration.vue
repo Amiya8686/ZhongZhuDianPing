@@ -1,19 +1,12 @@
 <script setup>
-<<<<<<< HEAD
 import { ref, getCurrentInstance, onMounted, computed } from 'vue'
-=======
-import { ref, getCurrentInstance, onMounted } from 'vue'
->>>>>>> origin/dev2.0_Agent
 import { ArrowDown } from '@element-plus/icons-vue'
 import IconImg from '@/assets/imgs/icon/icon.svg'
 import MagicWorkShopTime from '@/components/magicWorkShopTime.vue'
 import MagicWorkShopSelector from '@/components/magicWorkShopSelector.vue'
-<<<<<<< HEAD
 import potNormalImg from '@/assets/imgs/magicWorkShop/IntelligentCommentGeneration/xiaoguo/normal.png'
 import potThinkingImg from '@/assets/imgs/magicWorkShop/IntelligentCommentGeneration/xiaoguo/thinking.png'
 import potCookingImg from '@/assets/imgs/magicWorkShop/IntelligentCommentGeneration/xiaoguo/cooking.png'
-=======
->>>>>>> origin/dev2.0_Agent
 
 const { proxy } = getCurrentInstance()
 
@@ -87,7 +80,6 @@ const handleCommand = (command) => {
   }
 }
 
-<<<<<<< HEAD
 // 菜品展示相关
 const dishList = ref([])
 const currentDish = ref(null)
@@ -248,11 +240,6 @@ onMounted(() => {
   tokenVerify()
   loadUserInfo()
   loadDishList()
-=======
-onMounted(() => {
-  tokenVerify()
-  loadUserInfo()
->>>>>>> origin/dev2.0_Agent
 })
 </script>
 
@@ -295,7 +282,6 @@ onMounted(() => {
     <!-- 主内容区 -->
     <div class="main-content">
       <div class="main-canvas">
-<<<<<<< HEAD
         <div class="dish-panel">
           <!-- 顶部：当前菜品 + 选择按钮 -->
           <div class="dish-selector-bar">
@@ -403,11 +389,6 @@ onMounted(() => {
               <el-button type="warning" @click="continueCooking">🪄 继续炼制</el-button>
             </template>
           </el-dialog>
-=======
-        <div class="canvas-placeholder">
-          <span class="placeholder-icon">🖼️</span>
-          <span class="placeholder-text">画布区域</span>
->>>>>>> origin/dev2.0_Agent
         </div>
       </div>
 
@@ -542,15 +523,9 @@ onMounted(() => {
   display: flex;
   gap: 24px;
   max-width: 1400px;
-<<<<<<< HEAD
   margin: 16px auto;
   padding: 0 40px;
   height: calc(100vh - 102px);
-=======
-  margin: 24px auto;
-  padding: 0 40px;
-  height: calc(100vh - 118px);
->>>>>>> origin/dev2.0_Agent
 }
 
 .main-canvas {
@@ -558,7 +533,6 @@ onMounted(() => {
   background: white;
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-<<<<<<< HEAD
   overflow: hidden;
   min-width: 0;
 }
@@ -886,29 +860,6 @@ onMounted(() => {
   font-size: 32px;
   width: auto;
   height: auto;
-=======
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .canvas-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    color: #ccc;
-
-    .placeholder-icon {
-      font-size: 64px;
-    }
-
-    .placeholder-text {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ddd;
-    }
-  }
->>>>>>> origin/dev2.0_Agent
 }
 
 .side-panel {
