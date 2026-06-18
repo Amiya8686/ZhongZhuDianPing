@@ -1,6 +1,8 @@
 <script setup>
 import {ref, getCurrentInstance, onMounted} from "vue"
 import { ArrowDown } from '@element-plus/icons-vue'
+import likeIcon from '@/assets/imgs/icon/like.svg'
+import shitIcon from '@/assets/imgs/icon/shit.svg'
 const {proxy} = getCurrentInstance()
 
 //一开始先隐藏页面，等token验证成功了再显示页面
@@ -25,7 +27,7 @@ const sortBy = ref('default')
 
 //分页相关
 const pageIndex = ref(1)
-const numPerPage = ref(9)  //每页9个（3x3网格）
+const numPerPage = ref(12)  //每页12个（4x3网格）
 const totalPageNum = ref(0)
 
 //验证token
@@ -148,6 +150,11 @@ const goToMyComment = () => {
   window.open('/user/myComment')
 }
 
+//跳转到智能评论生成页
+const goToSmartComment = (dishID) => {
+  window.open(`/magicWorkshop/intelligentCommentGeneration.html?dishID=${dishID}`, '_blank')
+}
+
 //退出登录
 const handleLogout = () => {
   localStorage.removeItem('token')
@@ -220,14 +227,14 @@ onMounted(() => {
           round
           @click="handleSortChange('like')"
         >
-          👍 最多赞
+          <img :src="likeIcon" class="sort-icon" /> 最多赞
         </el-button>
         <el-button
           :type="sortBy === 'bad' ? 'warning' : 'default'"
           round
           @click="handleSortChange('bad')"
         >
-          👎 最多踩
+          <img :src="shitIcon" class="sort-icon" /> 最多踩
         </el-button>
         <el-button
           :type="sortBy === 'default' ? 'primary' : 'default'"
@@ -264,7 +271,7 @@ onMounted(() => {
               :class="{ active: dish.evaluation === 'like' }"
               @click="handleEvaluate(dish, 'like')"
             >
-              <span class="icon">👍</span>
+              <img :src="likeIcon" class="icon" />
               <span>{{ dish.like }}</span>
             </button>
             <button
@@ -272,10 +279,20 @@ onMounted(() => {
               :class="{ active: dish.evaluation === 'bad' }"
               @click="handleEvaluate(dish, 'bad')"
             >
-              <span class="icon">👎</span>
+              <img :src="shitIcon" class="icon" />
               <span>{{ dish.bad }}</span>
             </button>
           </div>
+
+          <!-- 智能评论生成 -->
+          <el-button
+            type="warning"
+            size="small"
+            class="smart-comment-btn"
+            @click.stop="goToSmartComment(dish.ID)"
+          >
+            🪄 智能评论生成
+          </el-button>
         </div>
       </div>
     </div>
@@ -392,6 +409,14 @@ onMounted(() => {
   gap: 20px;
 }
 
+.sort-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
 .sort-label {
   font-size: 18px;
   color: #333;
@@ -409,7 +434,7 @@ onMounted(() => {
   margin: 30px auto;
   padding: 0 20px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 30px;
 }
 
@@ -442,7 +467,7 @@ onMounted(() => {
     object-fit: cover;
     transition: transform 0.5s;
   }
-  
+
   &:hover img {
     transform: scale(1.1);
   }
@@ -491,64 +516,69 @@ onMounted(() => {
 /* 评价按钮 */
 .dish-actions {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   margin-top: auto;
+  margin-bottom: 12px;
 }
 
 .action-btn {
   flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 8px 10px;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  
+  gap: 6px;
+  background: #fafafa;
+  color: #999;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: #ddd;
+  }
+
   .icon {
-    font-size: 18px;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
   }
 }
 
 .action-btn-like {
-  background: #f1f3f5;
-  color: #868e96;
-  
-  &:hover {
-    background: #e9ecef;
-    color: #495057;
-  }
-  
   &.active {
-    background: #ffec99;
+    background: #fff7e6;
+    border-color: #ffc069;
     color: #f08c00;
-    
-    .icon {
-      transform: scale(1.2);
-    }
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
   }
 }
 
 .action-btn-bad {
-  background: #f1f3f5;
-  color: #868e96;
-  
-  &:hover {
-    background: #e9ecef;
-    color: #495057;
-  }
-  
   &.active {
-    background: #ffe3e3;
+    background: #fff0f0;
+    border-color: #ffa39e;
     color: #e03131;
-    
-    .icon {
-      transform: scale(1.2);
-    }
+    box-shadow: 0 2px 8px rgba(224, 49, 49, 0.12);
+  }
+}
+
+/* 智能评论生成按钮 */
+.smart-comment-btn {
+  width: 100%;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8e3c, #ff6b6b);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+
+  &:hover {
+    background: linear-gradient(135deg, #e07b30, #e55a5a);
+    color: #fff;
   }
 }
 
@@ -577,11 +607,17 @@ onMounted(() => {
 /* 响应式设计 */
 @media (max-width: 1200px) {
   .dish-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
+  .dish-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
   .dish-grid {
     grid-template-columns: 1fr;
   }

@@ -3,6 +3,9 @@ import {reactive, getCurrentInstance, onMounted, ref, computed} from "vue"
 import {defaultUserInfo} from "@/config/defaultUserInfo"
 import { ArrowDown } from '@element-plus/icons-vue' // <-- 添加这一行
 import IconImg from '@/assets/imgs/icon/icon.svg'
+import foodReviewImg from '@/assets/imgs/home/foodReview.png'
+import foodMapImg from '@/assets/imgs/home/foodMap.png'
+import foodWorkShopImg from '@/assets/imgs/home/foodWorkShop.png'
 const {proxy} = getCurrentInstance()
 
 //用户信息
@@ -227,21 +230,27 @@ onMounted(() => {
           <h2 class="sectionTitle">平台功能</h2>
           <div class="featureCards">
             <el-card class="featureCard" shadow="hover" @click="goToFoodReview">
-              <div class="cardIcon">🍜</div>
-              <h3>美食点评</h3>
-              <p>浏览档口列表，查看详细信息和用户评价</p>
+              <div class="cardCover" :style="{backgroundImage: `url(${foodReviewImg})`}"></div>
+              <div class="cardOverlay">
+                <h3>美食点评</h3>
+                <p>浏览档口列表，查看详细信息和用户评价</p>
+              </div>
             </el-card>
-            
+
             <el-card class="featureCard" shadow="hover" @click="handleFoodMap">
-              <div class="cardIcon">🗺️</div>
-              <h3>美食地图</h3>
-              <p>地图导航，快速找到心仪的美食位置</p>
+              <div class="cardCover" :style="{backgroundImage: `url(${foodMapImg})`}"></div>
+              <div class="cardOverlay">
+                <h3>美食地图</h3>
+                <p>地图导航，快速找到心仪的美食位置</p>
+              </div>
             </el-card>
-            
+
             <el-card class="featureCard" shadow="hover" @click="goToMagicWorkShop">
-              <div class="cardIcon">✨</div>
-              <h3>美食工访</h3>
-              <p>开一段奇妙的冒险</p>
+              <div class="cardCover" :style="{backgroundImage: `url(${foodWorkShopImg})`}"></div>
+              <div class="cardOverlay">
+                <h3>美食工访</h3>
+                <p>和美食魔法师们开启一段奇妙的冒险</p>
+              </div>
             </el-card>
           </div>
         </div>
@@ -260,13 +269,15 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: #fef6e4;
+  background-image: radial-gradient(#f3d2c1 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 /* 导航栏 */
 .navbar{
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #ff8e3c;
+  box-shadow: 0 4px 12px rgba(255, 142, 60, 0.3);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -307,17 +318,16 @@ onMounted(() => {
       h1{
         margin: 0;
         font-size: 24px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        font-weight: 800;
+        color: white;
+        text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+        letter-spacing: 2px;
       }
-      
+
       .logoSubtitle{
         display: block;
-        font-size: 12px;
-        color: #999;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
         margin-top: 2px;
       }
     }
@@ -334,19 +344,26 @@ onMounted(() => {
           align-items: center;
           gap: 10px;
           cursor: pointer;
-          padding: 5px 10px;
+          padding: 5px 15px;
           border-radius: 20px;
           outline: none;
-          transition: background-color 0.3s;
-          
+          border: none;
+          background: rgba(255, 255, 255, 0.2);
+          transition: all 0.3s;
+
           &:hover{
-            background-color: #f5f5f5;
-            border: 1px solid #333;
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
           }
-          
+
           .userName{
             font-size: 14px;
-            color: #333;
+            color: white;
+            font-weight: 600;
+          }
+
+          .el-icon {
+            color: white;
           }
         }
       }
@@ -362,7 +379,7 @@ onMounted(() => {
 /* 推荐店铺横幅 */
 .recommendSection{
   padding: 40px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgba(0, 0, 0, 0.08);
   
   .container{
     max-width: 1200px;
@@ -373,9 +390,9 @@ onMounted(() => {
       font-size: 32px;
       font-weight: 600;
       margin: 0 0 30px 0;
-      color: white;
+      color: #333;
     }
-    
+
     .stallCarouselItem{
       display: flex;
       gap: 30px;
@@ -472,10 +489,21 @@ onMounted(() => {
   
   // 自定义走马灯箭头
   :deep(.el-carousel__arrow){
-    background-color: rgba(255, 255, 255, 0.8);
-    
+    width: 44px;
+    height: 44px;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    font-size: 18px;
+    color: #ff8e3c;
+
     &:hover{
-      background-color: white;
+      background-color: #ff8e3c;
+      color: #fff;
+    }
+
+    i {
+      font-size: 20px;
+      font-weight: bold;
     }
   }
   
@@ -515,28 +543,45 @@ onMounted(() => {
       .featureCard{
         cursor: pointer;
         transition: transform 0.3s;
-        text-align: center;
-        padding: 20px;
-        
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+
+        :deep(.el-card__body) {
+          padding: 0;
+        }
+
         &:hover{
           transform: translateY(-10px);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.12);
         }
-        
-        .cardIcon{
-          font-size: 60px;
-          margin-bottom: 20px;
+
+        .cardCover{
+          width: 100%;
+          height: 240px;
+          background-size: cover;
+          background-position: center;
         }
-        
+
+        .cardOverlay{
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 20px 16px;
+          background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+        }
+
         h3{
-          font-size: 24px;
-          font-weight: 600;
-          margin: 0 0 10px 0;
-          color: #333;
+          font-size: 20px;
+          font-weight: 700;
+          margin: 0 0 6px 0;
+          color: #fff;
         }
-        
+
         p{
-          font-size: 14px;
-          color: #666;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.85);
           line-height: 1.6;
           margin: 0;
         }
@@ -556,6 +601,21 @@ onMounted(() => {
     margin: 0;
     font-size: 14px;
   }
+}
+
+/* Element Plus 橙色主题覆盖 */
+:deep(.el-button--primary) {
+  --el-button-bg-color: #ff8e3c;
+  --el-button-border-color: #ff8e3c;
+  --el-button-hover-bg-color: #e07b30;
+  --el-button-hover-border-color: #e07b30;
+}
+
+:deep(.el-button--default) {
+  --el-button-text-color: #ff8e3c;
+  --el-button-border-color: #ff8e3c;
+  --el-button-hover-text-color: #e07b30;
+  --el-button-hover-border-color: #e07b30;
 }
 
 </style>

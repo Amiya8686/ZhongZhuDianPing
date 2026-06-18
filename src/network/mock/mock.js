@@ -5,6 +5,7 @@ import Mock from "mockjs"
 import user from "./user.js"
 import comment from "./comment.js"
 import food from "./food.js"
+import agent from "./agent.js"
 import stallManage from "@/network/mock/background/stallManage.js"
 import requestConfig from "@/config/requestConfig.js";
 
@@ -31,6 +32,8 @@ if(requestConfig.isMock){
     Mock.mock(/\/api\/food\/createStallComment/,"post",options=>{return comment.createStallComment(options)});
     Mock.mock(/\/api\/food\/evaluationComment/,"post",options=>{return comment.evaluationComment(options)});
     Mock.mock(/\/api\/home\/getRecommendedStall/,"get",options=>{return food.getRecommendedStall(options)});
+    Mock.mock(/\/api\/agent\/intelligentCommentGeneration\/getDishList/,"get",options=>{return agent.getDishList(options)});
+    Mock.mock(/\/api\/agent\/stallIntelligentAnalysis\/getStallList/,"get",options=>{return agent.getStallList(options)});
     
     //后台管理mock
     Mock.mock(/\/api\/background\/checkToken/,"get",options=>{return admin.checkTokenApi(options)});
