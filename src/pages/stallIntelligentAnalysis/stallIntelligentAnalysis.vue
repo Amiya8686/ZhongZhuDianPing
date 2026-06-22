@@ -27,7 +27,7 @@ const stallList = ref([])
 const currentStall = ref(null)
 
 const hasAnalysis = computed(() => Boolean(analysisResult.value))
-const isGeneratedAnalysis = computed(() => hasAnalysis.value && !analysisResult.value?.isPlaceholder)
+const isGeneratedAnalysis = computed(() => hasAnalysis.value)
 
 const positiveKeywords = computed(() => analysisResult.value?.positiveKeywords || [])
 const negativeKeywords = computed(() => analysisResult.value?.negativeKeywords || [])
@@ -35,19 +35,24 @@ const advantages = computed(() => analysisResult.value?.advantages || [])
 const disadvantages = computed(() => analysisResult.value?.disadvantages || [])
 const summaryComment = computed(() => analysisResult.value?.comment || '')
 
-const pendingAnalysisText = {
-  positiveKeywords: ['待生成优点', '用户好评', '种草关键词'],
-  negativeKeywords: ['待生成槽点', '用户吐槽', '避雷关键词'],
-  advantages: ['点击“生成评析”后展示用户集中夸赞点'],
-  disadvantages: ['点击“生成评析”后展示用户集中吐槽点']
+const emptyAnalysisText = {
+  positiveKeywords: ['口味表现', '招牌特色', '用餐体验', '服务态度', '出餐效率', '价格感受', '分量感受', '食材口感', '搭配丰富', '复购意愿', '整体印象', '推荐指数', '校园口碑', '就餐便利'],
+  negativeKeywords: ['口味波动', '排队体验', '出餐等待', '饮品状态', '价格争议', '分量争议', '服务细节', '高峰拥挤', '卫生印象', '菜品稳定', '搭配不足', '复购顾虑', '体验落差', '改进空间'],
+  advantages: ['当前评论更偏向正面体验，可从口味、分量和服务继续观察'],
+  disadvantages: ['当前吐槽点不集中，可重点留意出餐、饮品和服务细节']
 }
 
-const emptyAnalysisText = {
-  positiveKeywords: ['样本较少', '等待好评', '继续观察'],
-  negativeKeywords: ['样本较少', '暂无明显槽点', '继续观察'],
-  advantages: ['当前评论样本不足，暂未提取到明确优点'],
-  disadvantages: ['当前评论样本不足，暂未提取到明确缺点']
-}
+const lowValueAnalysisPattern = /样本|数据不足|评论不足|更多样本|等待好评|继续观察|待补充|用户反馈少|评分待观察|后续更新|继续收集|可信度有限|分析可信度|口碑积累中|推荐待验证|风险待验证/
+
+const keywordExpansionRules = [
+  { test: /汉堡|肉饼|芝士|面包|薯条|套餐/, words: ['汉堡扎实', '肉饼厚实', '芝士香浓', '面包松软', '薯条脆爽', '套餐搭配', '饱腹感强', '快餐友好'] },
+  { test: /可乐|饮料|汽水|没气|气泡/, words: ['可乐没气', '饮品状态', '气泡不足', '套餐饮品', '饮料体验', '出品细节', '口感落差', '饮品稳定'] },
+  { test: /好吃|口味|味道|香|鲜|辣|咸|甜/, words: ['口味在线', '香气明显', '调味顺口', '入口满足', '风味稳定', '味道讨喜', '下饭友好', '口感丰富'] },
+  { test: /态度|服务|老板|阿姨|热情/, words: ['服务态度好', '沟通顺畅', '响应及时', '体验亲切', '服务稳定', '态度加分'] },
+  { test: /性价比|价格|便宜|实惠|贵/, words: ['性价比高', '价格友好', '花费可控', '学生友好', '实惠选择', '预算友好'] },
+  { test: /分量|份量|饱|足|多|少/, words: ['分量扎实', '饱腹感强', '份量稳定', '吃得满足', '主食充足', '配料实在'] },
+  { test: /排队|等待|慢|出餐|高峰/, words: ['高峰等待', '出餐节奏', '排队体验', '效率波动', '等待偏久', '动线拥挤'] }
+]
 
 const tokenVerify = async () => {
   try {
@@ -76,17 +81,8 @@ const getQueryParam = (name) => {
   return searchParams.get(name)
 }
 
-const createPendingAnalysisResult = (stall) => ({
-  positiveKeywords: pendingAnalysisText.positiveKeywords,
-  negativeKeywords: pendingAnalysisText.negativeKeywords,
-  advantages: pendingAnalysisText.advantages,
-  disadvantages: pendingAnalysisText.disadvantages,
-  comment: `${stall?.stallName || '该档口'} 已选中，点击“生成评析”后会根据评论生成 AI 综合口碑点评。`,
-  isPlaceholder: true
-})
-
 const resetAnalysis = () => {
-  analysisResult.value = currentStall.value ? createPendingAnalysisResult(currentStall.value) : null
+  analysisResult.value = null
   analysisError.value = ''
   lastAnalysisStallID.value = null
 }
@@ -166,9 +162,24 @@ const normalizeTextItem = (item) => {
   return String(item).trim()
 }
 
+const isUsefulAnalysisText = (text) => {
+  const normalizedText = normalizeTextItem(text)
+  return normalizedText && !lowValueAnalysisPattern.test(normalizedText)
+}
+
+const cleanSummaryComment = (text) => {
+  return normalizeTextItem(text)
+    .replace(/由于?样本量?较少[，,、]?\s*分析可信度有限。?/g, '')
+    .replace(/样本量?较少[，,、]?\s*分析可信度有限。?/g, '')
+    .replace(/由于?评论数量?较少[，,、]?\s*分析可信度有限。?/g, '')
+    .replace(/请等待更多用户评价。?/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 const normalizeArray = (value, fallback = []) => {
   if (Array.isArray(value)) {
-    const list = value.map(normalizeTextItem).filter(Boolean)
+    const list = value.map(normalizeTextItem).filter(isUsefulAnalysisText)
     return list.length ? list : fallback
   }
   if (typeof value === 'string') {
@@ -181,19 +192,46 @@ const normalizeArray = (value, fallback = []) => {
         // Dify 有时会返回普通字符串，这里解析失败就按分隔符拆词。
       }
     }
-    const list = text.split(/[,，、\n]/).map(item => item.trim()).filter(Boolean)
+    const list = text.split(/[,，、\n]/).map(item => item.trim()).filter(isUsefulAnalysisText)
     return list.length ? list : fallback
   }
   if (value && typeof value === 'object') {
     const directText = normalizeTextItem(value)
     if (directText) return [directText]
-    const list = Object.values(value).flatMap(item => normalizeArray(item, [])).filter(Boolean)
+    const list = Object.values(value).flatMap(item => normalizeArray(item, [])).filter(isUsefulAnalysisText)
     return list.length ? list : fallback
   }
   return fallback
 }
 
 const ensureList = (list, fallback) => (Array.isArray(list) && list.length ? list : fallback)
+
+const expandKeywordList = (list, fallback, limit = 18) => {
+  const seen = new Set()
+  const expanded = []
+  const append = (items) => {
+    normalizeArray(items, []).forEach((item) => {
+      const word = normalizeTextItem(item)
+      if (isUsefulAnalysisText(word) && !seen.has(word)) {
+        seen.add(word)
+        expanded.push(word)
+      }
+    })
+  }
+
+  append(list)
+  expanded.slice().forEach((word) => {
+    keywordExpansionRules.forEach((rule) => {
+      if (rule.test.test(word)) {
+        append(rule.words)
+      }
+    })
+  })
+  if (expanded.length < limit) {
+    append(fallback)
+  }
+  return expanded.slice(0, limit)
+}
 
 const pickValue = (data, ...keys) => {
   for (const key of keys) {
@@ -243,15 +281,17 @@ const normalizeAnalysisResult = (data) => {
     ),
     ensureList(negativeWordcloud, ensureList(disadvantageItems, emptyAnalysisText.negativeKeywords))
   )
-  const goodPoints = ensureList(advantageItems, ensureList(positive.slice(0, 3), emptyAnalysisText.advantages))
-  const badPoints = ensureList(disadvantageItems, ensureList(negative.slice(0, 3), emptyAnalysisText.disadvantages))
-  const comment = normalizeTextItem(
+  const expandedPositive = expandKeywordList(positive, emptyAnalysisText.positiveKeywords)
+  const expandedNegative = expandKeywordList(negative, emptyAnalysisText.negativeKeywords)
+  const goodPoints = ensureList(advantageItems, ensureList(expandedPositive.slice(0, 3), emptyAnalysisText.advantages))
+  const badPoints = ensureList(disadvantageItems, ensureList(expandedNegative.slice(0, 3), emptyAnalysisText.disadvantages))
+  const comment = cleanSummaryComment(
     pickValue(data, 'comment', 'summary', 'analysis', 'overall_summary', 'overallSummary')
   )
 
   return {
-    positiveKeywords: positive.slice(0, 10),
-    negativeKeywords: negative.slice(0, 10),
+    positiveKeywords: expandedPositive,
+    negativeKeywords: expandedNegative,
     advantages: goodPoints.slice(0, 4),
     disadvantages: badPoints.slice(0, 4),
     comment: comment || '该店铺暂无用户评论，样本量为0，无法进行有效分析，请等待更多用户评价。'
@@ -292,7 +332,20 @@ const loadStallEvidence = async () => {
   return {
     stall_name: currentStall.value.stallName,
     rating: String(rating),
-    comments_json: JSON.stringify(normalizedComments).slice(0, 19000)
+    comments_json: JSON.stringify({
+      stallID,
+      stallName: currentStall.value.stallName,
+      canteenName: currentStall.value.canteenName,
+      rating: String(rating),
+      comments: normalizedComments,
+      outputRequirements: {
+        style: '像校园美食点评，不要像数据报告',
+        avoid: ['样本量较少', '可信度有限', '数据不足', '需要更多样本', '等待更多评价', '无法有效分析'],
+        comment: '直接基于已有评论给出自然、具体、有判断力的综合口碑点评。',
+        keywords: 'positiveKeywords 和 negativeKeywords 尽量各给 12 到 18 个具体短词。若负向评论少，也围绕真实槽点做同义扩展，不要补统计提示词。',
+        jsonOnly: true
+      }
+    }).slice(0, 19000)
   }
 }
 
@@ -327,11 +380,11 @@ const generateAnalysis = async () => {
 }
 
 const keywordSizeClass = (index) => {
-  if (index === 0) return 'size-xl'
-  if (index <= 2) return 'size-lg'
-  if (index <= 5) return 'size-md'
-  return 'size-sm'
+  const sizeMap = ['size-xl', 'size-md', 'size-lg', 'size-sm', 'size-md', 'size-lg', 'size-sm', 'size-md']
+  return sizeMap[index % sizeMap.length]
 }
+
+const keywordToneClass = (index) => `tone-${index % 5}`
 
 const copyAnalysis = async () => {
   if (!analysisResult.value || !isGeneratedAnalysis.value) return
@@ -452,10 +505,9 @@ onMounted(async () => {
                   {{ currentStall.canteenName }}
                   <span v-if="currentStall.type"> · {{ currentStall.type }}</span>
                 </span>
-                <span class="current-stall-extra">
+                <span class="current-stall-extra" v-if="currentStall.rating || currentStall.meanPrice">
                   <span v-if="currentStall.rating">评分 {{ currentStall.rating }}</span>
                   <span v-if="currentStall.meanPrice">￥{{ currentStall.meanPrice }}/人</span>
-                  <span v-if="!currentStall.rating && !currentStall.meanPrice">点击生成 AI 口碑评析</span>
                 </span>
               </div>
             </div>
@@ -501,6 +553,7 @@ onMounted(async () => {
               </el-popover>
 
               <el-button
+                v-if="isGeneratedAnalysis"
                 type="warning"
                 size="large"
                 class="analyze-btn"
@@ -509,16 +562,28 @@ onMounted(async () => {
                 @click="generateAnalysis"
               >
                 <el-icon v-if="!analysisLoading"><TrendCharts /></el-icon>
-                生成评析
+                重新生成评析
               </el-button>
             </div>
           </div>
 
           <div class="analysis-content">
-            <div class="empty-state" v-if="!hasAnalysis && !analysisLoading && !analysisError">
+            <div class="generate-ready-state" v-if="!isGeneratedAnalysis && !analysisLoading">
               <img :src="StallAnalysisImg" class="empty-img" />
               <h2>食堂探长评析局</h2>
-              <p>选择一个档口后生成 AI 口碑评析，探长会把评论里的夸赞和吐槽拆成两张关键词云。</p>
+              <div class="generate-center-action" v-if="currentStall">
+                <el-button
+                  type="warning"
+                  size="large"
+                  class="center-analyze-btn"
+                  @click="generateAnalysis"
+                >
+                  <el-icon><TrendCharts /></el-icon>
+                  生成评析
+                </el-button>
+                <span>点击生成 AI 口碑评析</span>
+              </div>
+              <p v-else>先选择一个档口，探长会把评论里的夸赞和吐槽拆成两张关键词云。</p>
             </div>
 
             <div class="loading-state" v-if="analysisLoading">
@@ -535,7 +600,7 @@ onMounted(async () => {
               :closable="false"
             />
 
-            <div class="result-board" v-if="hasAnalysis && !analysisLoading">
+            <div class="result-board" v-if="isGeneratedAnalysis && !analysisLoading">
               <div class="board-header">
                 <div>
                   <span class="board-kicker">AI 口碑雷达</span>
@@ -558,7 +623,7 @@ onMounted(async () => {
                       v-for="(word, index) in negativeKeywords"
                       :key="`negative-${word}-${index}`"
                       class="word-chip negative-word"
-                      :class="keywordSizeClass(index)"
+                      :class="[keywordSizeClass(index), keywordToneClass(index)]"
                     >
                       {{ word }}
                     </span>
@@ -582,7 +647,7 @@ onMounted(async () => {
                       v-for="(word, index) in positiveKeywords"
                       :key="`positive-${word}-${index}`"
                       class="word-chip positive-word"
-                      :class="keywordSizeClass(index)"
+                      :class="[keywordSizeClass(index), keywordToneClass(index)]"
                     >
                       {{ word }}
                     </span>
@@ -592,16 +657,16 @@ onMounted(async () => {
               </div>
 
               <div class="insight-row">
-                <div class="insight-card positive-insight">
-                  <h3>主要优点</h3>
-                  <ul>
-                    <li v-for="(item, index) in advantages" :key="`advantage-${index}`">{{ item }}</li>
-                  </ul>
-                </div>
                 <div class="insight-card negative-insight">
                   <h3>主要缺点</h3>
                   <ul>
                     <li v-for="(item, index) in disadvantages" :key="`disadvantage-${index}`">{{ item }}</li>
+                  </ul>
+                </div>
+                <div class="insight-card positive-insight">
+                  <h3>主要优点</h3>
+                  <ul>
+                    <li v-for="(item, index) in advantages" :key="`advantage-${index}`">{{ item }}</li>
                   </ul>
                 </div>
               </div>
@@ -942,7 +1007,7 @@ onMounted(async () => {
   background: #fbfcff;
 }
 
-.empty-state {
+.generate-ready-state {
   height: 100%;
   min-height: 420px;
   display: flex;
@@ -973,6 +1038,31 @@ onMounted(async () => {
     font-size: 15px;
     line-height: 1.7;
   }
+}
+
+.generate-center-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+
+  span {
+    color: #ff8e3c;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+}
+
+.center-analyze-btn {
+  min-width: 136px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(230, 162, 60, 0.22);
 }
 
 .loading-state {
@@ -1032,7 +1122,7 @@ onMounted(async () => {
 }
 
 .word-card {
-  min-height: 260px;
+  min-height: 300px;
   border-radius: 16px;
   padding: 20px;
   background: white;
@@ -1074,8 +1164,8 @@ onMounted(async () => {
   justify-content: center;
   align-content: center;
   flex-wrap: wrap;
-  gap: 10px 14px;
-  padding: 18px 8px 4px;
+  gap: 12px 18px;
+  padding: 22px 8px 4px;
 }
 
 .word-chip {
@@ -1085,6 +1175,7 @@ onMounted(async () => {
   font-weight: 800;
   line-height: 1.15;
   white-space: nowrap;
+  transform-origin: center;
 }
 
 .negative-word {
@@ -1114,6 +1205,31 @@ onMounted(async () => {
 
 .size-sm {
   font-size: 13px;
+}
+
+.tone-0 {
+  opacity: 0.96;
+  transform: rotate(-6deg);
+}
+
+.tone-1 {
+  opacity: 0.88;
+  transform: rotate(3deg);
+}
+
+.tone-2 {
+  opacity: 0.98;
+  transform: rotate(0deg);
+}
+
+.tone-3 {
+  opacity: 0.82;
+  transform: rotate(-2deg);
+}
+
+.tone-4 {
+  opacity: 0.9;
+  transform: rotate(5deg);
 }
 
 .vs-badge {
@@ -1287,6 +1403,11 @@ onMounted(async () => {
     .el-button {
       width: 100%;
     }
+  }
+
+  .generate-center-action {
+    flex-direction: column;
+    gap: 10px;
   }
 
   .insight-row {
