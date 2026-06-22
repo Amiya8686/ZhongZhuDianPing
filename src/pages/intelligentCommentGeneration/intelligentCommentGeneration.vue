@@ -340,6 +340,14 @@ onMounted(() => {
           <div class="pot-content-area">
             <!-- 小锅图片 -->
             <div class="pot-area">
+              <template v-if="potState === 'thinking'">
+                <span class="think-q q1">？</span>
+                <span class="think-q q2">？</span>
+                <span class="think-q q3">？</span>
+                <span class="think-q q4">？</span>
+                <span class="think-q q5">？</span>
+                <span class="think-q q6">？</span>
+              </template>
               <img :src="potImgSrc" class="pot-img" :class="potState" />
               <img v-if="isFlying" :src="flyingIcon" class="flying-food" />
               <p class="pot-hint" v-if="potState === 'thinking'">小锅思考中...</p>
@@ -719,6 +727,21 @@ onMounted(() => {
     pointer-events: none;
   }
 
+  .think-q {
+    position: absolute;
+    font-weight: 900;
+    color: #ff8e3c;
+    pointer-events: none;
+    animation: question-wobble 0.6s ease-in-out infinite;
+
+    &.q1 { top: -10px; left: 45%; font-size: 36px; animation-delay: 0s; }
+    &.q2 { top: 10px; left: 25%; font-size: 24px; animation-delay: 0.15s; opacity: 0.7; }
+    &.q3 { top: 0px; left: 62%; font-size: 28px; animation-delay: 0.3s; opacity: 0.8; }
+    &.q4 { top: -5px; left: 35%; font-size: 20px; animation-delay: 0.1s; opacity: 0.6; }
+    &.q5 { top: 8px; left: 55%; font-size: 32px; animation-delay: 0.2s; opacity: 0.75; }
+    &.q6 { top: -2px; left: 73%; font-size: 22px; animation-delay: 0.35s; opacity: 0.65; }
+  }
+
   .pot-hint {
     position: absolute;
     bottom: -20px;
@@ -735,6 +758,12 @@ onMounted(() => {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-4px) rotate(-2deg); }
   75% { transform: translateX(4px) rotate(2deg); }
+}
+
+@keyframes question-wobble {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(-15deg); }
+  75% { transform: translateX(-50%) rotate(15deg); }
 }
 
 @keyframes fly-to-pot {
