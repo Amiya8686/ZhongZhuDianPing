@@ -12,7 +12,7 @@ import path from 'node:path'
 
 // ==================== 💡 DIFY 全局及路由配置 ====================
 const DIFY_INFO = {
-  host: "http://192.168.129.129:8080",
+  host: "http://localhost:8080",
   urls: {
     agent: "/v1/chat-messages",
     chatFlow: "/v1/chat-messages",
@@ -31,7 +31,7 @@ const DIFY_APP_INFO = {
     type: 'chatFlow'
   },
   stallIntelligentAnalysis: {
-    apiKey: 'Bearer xxx',
+    apiKey: 'Bearer app-Da96CJv2eAE6PgpKpHXe5HW3',
     type: 'workFlow'
   }
 }
