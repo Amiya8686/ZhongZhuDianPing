@@ -1,4 +1,4 @@
-import { chatNetworkStream, interactMagicPot } from '@/network/difyRequest';
+import { chatNetworkStream, interactMagicPot, analyzeStall } from '@/network/difyRequest';
 
 // 智能问答助手API
 /* @param {string} query            - 页面层传入的用户提问文本
@@ -19,11 +19,21 @@ const magicPotInteractService = (messages, conversationID = '') => {
   return interactMagicPot(messages, conversationID);
 };
 
+// 食堂探长档口评析API
+/* @param {Object} stallInfo        - 当前档口对象 { stallID, stallName, canteenName }
+ * @param {Object} inputs           - Dify 应用必填输入变量 { stall_name, rating, comments_json }
+ * @returns {Promise<Object>}       - 返回包含 { conversationID, data } 的清洗及反序列化后的纯 JS 分析结果
+ */
+const stallAnalysisService = (stallInfo, inputs = {}) => {
+  return analyzeStall(stallInfo, inputs);
+};
+
 
 
 
 
 export default { 
   chatServiceStream,
-  magicPotInteractService
+  magicPotInteractService,
+  stallAnalysisService
 }

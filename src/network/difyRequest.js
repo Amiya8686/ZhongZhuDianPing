@@ -224,4 +224,76 @@ const interactMagicPot = (messages, conversationID = '') => {
   });
 }
 
-export { chatNetworkStream, interactMagicPot }
+const parseDifyJsonPayload = (rawText, errorLabel) => {
+  let cleanedText = (rawText || '').trim();
+  cleanedText = cleanedText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+  cleanedText = cleanedText.replace(/<think>[\s\S]*$/g, '').trim();
+
+  const markdownRegex = /```(?:json)?\s*([\s\S]*?)\s*```/i;
+  const match = cleanedText.match(markdownRegex);
+  let jsonStr = match ? match[1].trim() : cleanedText;
+
+  const firstBrace = jsonStr.indexOf('{');
+  const lastBrace = jsonStr.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+  }
+
+  jsonStr = jsonStr
+    .replace(/:\s*True\b/g, ': true')
+    .replace(/:\s*False\b/g, ': false')
+    .replace(/:\s*None\b/g, ': null');
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch (parseError) {
+    console.error(`[${errorLabel} JSON清洗解析失败]:`, parseError, '原始文本:', rawText);
+    throw new Error(`${errorLabel}数据清洗解析异常`);
+  }
+}
+
+/** 食堂探长档口评析单轮分析函数
+ * @param {Object} stallInfo - 本轮发送的档口对象
+ * @returns {Promise<Object>} 返回包含 { conversationID, data } 的分析结果对象
+ */
+const analyzeStall = (stallInfo, inputs = {}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const baseUrl = difyConfig.baseUrl;
+      const appParam = difyConfig.apps.stallIntelligentAnalysis;
+
+      const response = await fetch(`${baseUrl}?app=${appParam}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          inputs,
+          response_mode: 'blocking',
+          user: 'student_demo_user'
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`智能档口评析请求失败, HTTP状态码: ${response.status}${errorText ? `, ${errorText}` : ''}`);
+      }
+
+      const responseJson = await response.json();
+      const outputs = responseJson?.data?.outputs || {};
+      const rawResult = outputs.analysis_json || outputs.result || outputs.text || outputs.answer || '';
+      const parsedData = typeof rawResult === 'object'
+        ? rawResult
+        : parseDifyJsonPayload(rawResult, 'StallAnalysis');
+      resolve({
+        conversationID: responseJson?.workflow_run_id || responseJson?.task_id || '',
+        data: parsedData
+      });
+    } catch (error) {
+      console.error('[StallAnalysis 通信异常]:', error);
+      reject(error);
+    }
+  });
+}
+
+export { chatNetworkStream, interactMagicPot, analyzeStall }
